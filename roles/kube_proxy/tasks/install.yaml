@@ -1,0 +1,64 @@
+---
+
+- name: Install packages
+  ansible.builtin.package:
+    name:
+      - socat
+      - conntrack
+      - ipset
+    state: present
+    update_cache: yes
+
+- name: Create kube-proxy config directory
+  ansible.builtin.file:
+    path: "{{ kube_proxy_config_dir }}"
+    state: directory
+
+- name: Copy file kube-proxy config
+  ansible.builtin.template:
+    src: kube_proxy_config.yaml.j2
+    dest: "{{ kube_proxy_config_dir }}/kube-proxy-config.yaml"
+
+- name: Is kube-proxy installed
+  ansible.builtin.stat:
+    path: "{{ kube_proxy_extract_dir }}/kube-proxy-{{ kube_proxy_version }}/kube-proxy"
+  register: kube_proxy_file_found
+
+- block:
+
+  - name: Create kube-proxy directory
+    ansible.builtin.file:
+      path: "{{ kube_proxy_extract_dir }}/kube-proxy-{{ kube_proxy_version }}"
+      state: directory
+
+  - shell: uname -s
+    register: os
+
+  - shell: dpkg --print-architecture
+    register: architecture
+
+  - name: Install kube-proxy from url
+    ansible.builtin.get_url:
+      url: "https://dl.k8s.io/v{{ kube_proxy_version }}/bin/{{ os.stdout | lower }}/{{ architecture.stdout }}/kube-proxy"
+      dest: "{{ kube_proxy_extract_dir }}/kube-proxy-{{ kube_proxy_version }}"
+      mode: u+x
+    when:
+      - kube_proxy_install_mode == 'network'
+
+  - name: Install kube-proxy from local dir
+    ansible.builtin.copy:
+      src: "{{ kube_proxy_local_binary_dir }}/kube-proxy"
+      dest: "{{ kube_proxy_extract_dir }}/kube-proxy-{{ kube_proxy_version }}"
+      mode: u+x
+    when:
+      - kube_proxy_install_mode == 'local'
+
+  - name: Create symlinks to /usr/local/bin
+    ansible.builtin.file:
+      src: "{{ kube_proxy_extract_dir }}/kube-proxy-{{ kube_proxy_version }}/kube-proxy"
+      path: "{{ kube_proxy_binary_dir }}/kube-proxy"
+      state: link
+      mode: a+x
+
+  when:
+    - not kube_proxy_file_found.stat.exists

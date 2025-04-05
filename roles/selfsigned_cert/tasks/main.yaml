@@ -1,0 +1,51 @@
+---
+
+- name: Create local cert directory
+  file:
+    path: "{{ cert_local_dir }}"
+    state: directory
+  delegate_to: "localhost"
+
+- name: Generate private key
+  community.crypto.openssl_privatekey:
+    path: "{{ cert_local_dir }}/{{ cert_key_file }}"
+    size: "{{ key_size }}"
+    type: "{{ key_type }}"
+    backup: yes
+  delegate_to: "localhost"
+
+- name: Generate certificate signing request with subject information
+  community.crypto.openssl_csr:
+    path: "{{ cert_local_dir }}/{{ cert_request_file }}"
+    privatekey_path: "{{ cert_local_dir }}/{{ cert_key_file }}"
+    basic_constraints: "CA:TRUE"
+    key_usage:
+      - cRLSign
+      - keyCertSign
+    use_common_name_for_san: false
+    country_name: "{{ country_name }}"
+    common_name: "CA"
+    state_or_province_name: "{{ state_or_province_name }}"
+    locality_name: "{{ locality_name }}"
+  delegate_to: "localhost"
+
+- name: Generate a self signed certificate
+  community.crypto.x509_certificate:
+    path: "{{ cert_local_dir }}/{{ cert_file }}"
+    privatekey_path: "{{ cert_local_dir }}/{{ cert_key_file }}"
+    csr_path: "{{ cert_local_dir }}/{{ cert_request_file }}"
+    provider: selfsigned
+  delegate_to: "localhost"
+
+- name: Create remote cert directory
+  file:
+    path: "{{ cert_dir }}"
+    state: directory
+
+- name: Copy private key and self signed certificate to remote servers
+  copy:
+    src: "{{ cert_local_dir }}/{{ item }}"
+    dest: "{{ cert_dir }}/{{ item }}"
+  loop:
+    - "{{ cert_key_file }}"
+    - "{{ cert_file }}"

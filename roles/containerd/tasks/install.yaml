@@ -1,0 +1,61 @@
+---
+
+- name: Create containerd config directory
+  ansible.builtin.file:
+    path: "{{ containerd_config_dir }}"
+    state: directory
+
+- name: Copy file containerd config
+  ansible.builtin.template:
+    src: containerd_config.toml.j2
+    dest: "{{ containerd_config_dir }}/config.toml"
+
+- name: Is containerd installed
+  ansible.builtin.stat:
+    path: "{{ containerd_extract_dir }}/containerd-{{ containerd_version }}"
+  register: containerd_dir
+
+- block:
+
+  - name: Create containerd directory
+    ansible.builtin.file:
+      path: "{{ containerd_extract_dir }}/containerd-{{ containerd_version }}"
+      state: directory
+
+  - shell: uname -s
+    register: os
+
+  - shell: dpkg --print-architecture
+    register: architecture
+
+  - name: Download contaiberd from url
+    ansible.builtin.unarchive:
+      src: "https://github.com/containerd/containerd/releases/download/v{{ containerd_version }}/containerd-{{ containerd_version }}-{{ os.stdout | lower }}-{{ architecture.stdout }}.tar.gz"
+      dest: "{{ containerd_extract_dir }}/containerd-{{ containerd_version }}"
+      remote_src: yes
+    when:
+      - containerd_install_mode == 'network'
+
+  - name: Download containerd from local dir
+    ansible.builtin.unarchive:
+      src: "{{ containerd_local_binary_dir }}/containerd-{{ containerd_version }}-{{ os.stdout | lower }}-{{ architecture.stdout }}.tar.gz"
+      dest: "{{ containerd_extract_dir }}/containerd-{{ containerd_version }}"
+    when:
+      - containerd_install_mode == 'local'
+
+  - name: Find all files in containerd
+    find:
+      paths: "{{ containerd_extract_dir }}/containerd-{{ containerd_version }}/bin"
+    register: find
+
+  - name: Create symlinks to /usr/local/bin
+    ansible.builtin.file:
+      src: "{{ containerd_extract_dir }}/containerd-{{ containerd_version }}/bin/{{ item.path | basename }}"
+      dest: "{{ containerd_binary_dir }}/{{ item.path | basename }}"
+      state: link
+      mode: u+x
+    with_items:
+      - "{{ find.files }}"
+
+  when:
+    - not containerd_dir.stat.exists

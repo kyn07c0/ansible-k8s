@@ -1,0 +1,51 @@
+---
+
+- name: Create etcd data directory
+  ansible.builtin.file:
+    path: "{{ etcd_data_dir }}"
+    state: directory
+
+- shell: uname -s
+  register: os
+
+- shell: dpkg --print-architecture
+  register: architecture
+
+- name: Checking the installation of etcd
+  ansible.builtin.stat:
+    path: "{{ etcd_extract_dir }}/etcd-v{{ etcd_version }}-{{ os.stdout | lower }}-{{ architecture.stdout }}/etcd"
+  register: etcd_file_found
+
+- name: Checking the installation etcdctl
+  ansible.builtin.stat:
+    path: "{{ etcd_extract_dir }}/etcd-v{{ etcd_version }}-{{ os.stdout | lower }}-{{ architecture.stdout }}/etcdctl"
+  register: etcdctl_file_found
+
+- block:
+
+  - name: Download etcd from url
+    ansible.builtin.unarchive:
+      src: "https://github.com/etcd-io/etcd/releases/download/v{{ etcd_version }}/etcd-v{{ etcd_version }}-{{ os.stdout | lower }}-{{ architecture.stdout }}.tar.gz"
+      dest: "{{ etcd_extract_dir }}"
+      remote_src: yes
+    when:
+      - etcd_install_mode == 'network'
+
+  - name: Download etcd from local dir
+    ansible.builtin.unarchive:
+      src: "{{ etcd_local_binary_dir }}/etcd-v{{ etcd_version }}-{{ os.stdout | lower }}-{{ architecture.stdout }}.tar.gz"
+      dest: "{{ etcd_extract_dir }}"
+    when:
+      - etcd_install_mode == 'local'
+
+  - name: Create symlinks to /usr/local/bin
+    ansible.builtin.file:
+      src: "{{ etcd_extract_dir }}/etcd-v{{ etcd_version }}-{{ os.stdout | lower }}-{{ architecture.stdout }}/{{ item }}"
+      path: "{{ etcd_binary_dir }}/{{ item | basename }}"
+      state: link
+      mode: a+x
+    with_items:
+      - etcd
+      - etcdctl
+
+  when: (not etcd_file_found.stat.exists) or (not etcdctl_file_found.stat.exists)

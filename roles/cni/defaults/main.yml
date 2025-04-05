@@ -1,0 +1,10 @@
+---
+
+cni_version: 1.4.1
+
+cni_extract_dir: /opt
+cni_binary_dir: /opt/cni/bin
+cni_config_dir: /etc/cni/net.d
+
+cni_install_mode: network
+cni_local_binary_dir: /home/yura/k8s/binary

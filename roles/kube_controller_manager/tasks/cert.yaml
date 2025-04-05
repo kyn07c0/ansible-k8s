@@ -1,0 +1,56 @@
+---
+
+- name: Generate private key for component
+  community.crypto.openssl_privatekey:
+    path: "{{ kube_controller_manager_cert_local_dir }}/{{kube_controller_manager_cert_key_file }}"
+    size: "{{ key_size }}"
+    type: "{{ key_type }}"
+  delegate_to: "localhost"
+
+- name: Generate a certificate signing request with subject information
+  community.crypto.openssl_csr:
+    path: "{{ kube_controller_manager_cert_local_dir }}/kube-controller-manager.csr"
+    privatekey_path: "{{ kube_controller_manager_cert_local_dir }}/{{ kube_controller_manager_cert_key_file }}"
+    basic_constraints: "CA:FALSE"
+    extended_key_usage:
+      - clientAuth
+      - serverAuth
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    key_usage_critical: true
+    common_name: "system:kube-controller-manager"
+    organization_name: "system:kube-controller-manager"
+    country_name: "{{ country_name }}"
+    state_or_province_name: "{{ state_or_province_name }}"
+    locality_name: "{{ locality_name }}"
+    subject_alt_name: "DNS:kube-proxy,IP:127.0.0.1"
+    create_subject_key_identifier: yes
+  delegate_to: "localhost"
+
+- name: Generate a certificate
+  community.crypto.x509_certificate:
+    path: "{{ kube_controller_manager_cert_local_dir }}/{{ kube_controller_manager_cert_file }}"
+    privatekey_path: "{{ kube_controller_manager_cert_local_dir }}/{{ kube_controller_manager_cert_key_file }}"
+    csr_path: "{{ kube_controller_manager_cert_local_dir }}/kube-controller-manager.csr"
+    ownca_path: "{{ kube_controller_manager_cert_local_dir }}/{{ ca_cert_file }}"
+    ownca_privatekey_path: "{{ kube_controller_manager_cert_local_dir }}/{{ ca_key_file }}"
+    provider: ownca
+  delegate_to: "localhost"
+
+- name: Create remote cert directory
+  file:
+    path: "{{ kube_controller_manager_cert_dir }}"
+    state: directory
+
+- name: Copy certificates for kube-controller-manager
+  ansible.builtin.copy:
+    src: "{{ kube_controller_manager_cert_local_dir }}/{{ item }}"
+    dest: "{{ kube_controller_manager_cert_dir }}"
+  with_items:
+    - "{{ ca_key_file }}"
+    - "{{ ca_cert_file }}"
+    - "{{ kube_controller_manager_cert_key_file }}"
+    - "{{ kube_controller_manager_cert_file }}"
+    - "{{ service_account_cert_key_file }}"
+    - "{{ service_account_cert_file }}"

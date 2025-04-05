@@ -1,0 +1,40 @@
+---
+
+- name: Install iptables
+  ansible.builtin.package:
+    name:
+      - iptables
+    state: present
+    update_cache: yes
+
+- name: Checking the installation of kubectl
+  ansible.builtin.stat:
+    path: "{{ kubectl_binary_dir }}/kubectl"
+  register: kubectl_file_found
+
+- block:
+
+  - shell: uname -s
+    register: os
+
+  - shell: dpkg --print-architecture
+    register: architecture
+
+  - name: Install kubectl from url
+    ansible.builtin.get_url:
+      url: "https://dl.k8s.io/v{{ kubectl_version }}/bin/{{ os.stdout | lower }}/{{ architecture.stdout }}/kubectl"
+      dest: "{{ kubectl_binary_dir }}/kubectl"
+      mode: u+x
+    when:
+      - kubectl_install_mode == 'network'
+
+  - name: Install kubectl from local dir
+    ansible.builtin.copy:
+      src: "{{ kubectl_local_binary_dir }}/kubectl"
+      dest: "{{ kubectl_binary_dir }}/kubectl"
+      mode: u+x
+    when:
+      - kubectl_install_mode == 'local'
+
+  when:
+    - not kubectl_file_found.stat.exists

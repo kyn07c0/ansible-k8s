@@ -1,0 +1,9 @@
+---
+
+runc_version: 1.1.12
+
+runc_extract_dir: /opt
+runc_binary_dir: /usr/local/bin
+
+runc_install_mode: network
+runc_local_binary_dir: /home/yura/k8s/binary

@@ -1,0 +1,15 @@
+---
+
+cert_local_dir: /home/yura/ssl
+cert_dir: /etc/kubernetes/pki
+
+cert_key_file: ca.key
+cert_request_file: ca.csr
+cert_file: ca.crt
+
+key_size: 4096
+key_type: RSA
+
+country_name: RU
+state_or_province_name: RUSSIA
+locality_name: Saint-Petersburg

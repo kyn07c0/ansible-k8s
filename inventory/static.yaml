@@ -1,0 +1,22 @@
+all:
+  children:
+    admin:
+      hosts:
+        k8s-admin:
+          ansible_host: 192.168.88.30
+    master:
+      hosts:
+        k8s-master:
+          ansible_host: 192.168.88.31
+    worker:
+      hosts:
+        k8s-worker1:
+          ansible_host: 192.168.88.32
+          pod_subnet: 192.168.1.0/24
+        k8s-worker2:
+          ansible_host: 192.168.88.33
+          pod_subnet: 192.168.2.0/24
+        #k8s-worker3:
+        #  ansible_host: 192.168.88.34
+        #  pod_subnet: 192.168.3.0/24
+

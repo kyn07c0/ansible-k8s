@@ -1,0 +1,26 @@
+---
+
+- name: Install service kube-apiserver
+  ansible.builtin.template:
+    src: kube-apiserver.service.j2
+    dest: /etc/systemd/system/kube-apiserver.service
+    mode: 0644
+  notify:
+    - reload systemd
+
+- name: Enable and start kube-apiserver
+  ansible.builtin.systemd:
+    name: kube-apiserver
+    state: started
+    enabled: yes
+
+- name: Check started service
+  ansible.builtin.service:
+    name: kube-apiserver
+    state: started
+  register: kube_apiserver_service_status
+
+- name: Terminate playbook if service is not running
+  ansible.builtin.fail:
+    msg: "The kube-apiserver service is not running. Playbook has stoped."
+  when: kube_apiserver_service_status.state != 'started'

@@ -1,0 +1,105 @@
+---
+
+- name: hostname
+  hosts:
+    - admin
+    - master
+    - worker
+  roles:
+    - hostname
+  tags: hostname
+
+- name: selfsigned_cert
+  hosts:
+    - admin
+    - master
+    - worker
+  roles:
+    - selfsigned_cert
+  tags: selfsigned-cert
+
+- name: kubectl
+  hosts:
+    - admin
+    - master
+    - worker
+  roles:
+    - kubectl
+  tags: kubectl
+
+- name: etcd
+  hosts:
+    - master
+  roles:
+    - etcd
+  tags: etcd
+
+- name: kube_apiserver
+  hosts:
+    - master
+  roles:
+    - kube_apiserver
+  tags: kube-apiserver
+
+- name: kube_scheduler
+  hosts:
+    - master
+  roles:
+    - kube_scheduler
+  tags: kube-scheduler
+
+- name: kube_controller_manager
+  hosts:
+    - master
+  roles:
+    - kube_controller_manager
+  tags: kube-controller-manager
+
+- name: crictl
+  hosts:
+    - worker
+  roles:
+    - crictl
+  tags: crictl
+
+- name: cni
+  hosts:
+    - worker
+  roles:
+    - cni
+  tags: cni
+
+- name: pod_route
+  hosts:
+    - worker
+  roles:
+    - pod_route
+  tags: pod_route
+
+- name: runc
+  hosts:
+    - worker
+  roles:
+    - runc
+  tags: runc
+
+- name: kube_proxy
+  hosts:
+    - worker
+  roles:
+    - kube_proxy
+  tags: kube-proxy
+
+- name: containerd
+  hosts:
+    - worker
+  roles:
+    - containerd
+  tags: containerd
+
+- name: kubelet
+  hosts:
+    - worker
+  roles:
+    - kubelet
+  tags: kubelet

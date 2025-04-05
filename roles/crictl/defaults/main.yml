@@ -1,0 +1,9 @@
+---
+
+crictl_version: 1.30.0
+
+crictl_extract_dir: /opt
+crictl_binary_dir: /usr/local/bin
+
+crictl_install_mode: network
+crictl_local_binary_dir: /home/yura/k8s/binary

@@ -1,0 +1,6 @@
+---
+
+- name: Add route
+  ansible.builtin.command: >
+    ip route replace {{ hostvars[item]['pod_subnet'] }} via {{ hostvars[item].ansible_host }}
+  with_items: "{{ groups['worker'] | difference([inventory_hostname]) }}"

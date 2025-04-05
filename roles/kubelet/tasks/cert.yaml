@@ -1,0 +1,61 @@
+---
+
+- name: Generate private key for workers nodes.
+  community.crypto.openssl_privatekey:
+    path: "{{ kubelet_cert_local_dir }}/{{ inventory_hostname }}.key"
+    size: "{{ key_size }}"
+    type: "{{ key_type }}"
+  delegate_to: "localhost"
+
+- name: Generate a certificate signing request with subject information
+  community.crypto.openssl_csr:
+    path: "{{ kubelet_cert_local_dir }}/{{ inventory_hostname }}.csr"
+    privatekey_path: "{{ kubelet_cert_local_dir }}/{{ inventory_hostname }}.key"
+    basic_constraints: "CA:FALSE"
+    extended_key_usage:
+      - clientAuth
+      - serverAuth
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    key_usage_critical: true
+    common_name: "system:node:{{ inventory_hostname }}"
+    organization_name: "system:nodes"
+    country_name: "{{ country_name }}"
+    state_or_province_name: "{{ state_or_province_name }}"
+    locality_name: "{{ locality_name }}"
+    subject_alt_name: "DNS:{{ inventory_hostname }},IP:127.0.0.1,IP:{{ ansible_host }}"
+    create_subject_key_identifier: yes
+  delegate_to: "localhost"
+
+- name: Generate a certificate
+  community.crypto.x509_certificate:
+    path: "{{ kubelet_cert_local_dir }}/{{ inventory_hostname }}.crt"
+    privatekey_path: "{{ kubelet_cert_local_dir }}/{{ inventory_hostname }}.key"
+    csr_path: "{{ kubelet_cert_local_dir }}/{{ inventory_hostname }}.csr"
+    ownca_path: "{{ kubelet_cert_local_dir }}/{{ ca_cert_file }}"
+    ownca_privatekey_path: "{{ kubelet_cert_local_dir }}/{{ ca_key_file }}"
+    provider: ownca
+  delegate_to: "localhost"
+
+- name: Create remote cert directory
+  file:
+    path: "{{ kubelet_cert_dir }}"
+    state: directory
+
+- name: Copy ca certificates
+  ansible.builtin.copy:
+    src: "{{ kubelet_cert_local_dir }}/{{ item }}"
+    dest: "{{ kubelet_cert_dir }}"
+  with_items:
+    - "{{ ca_key_file }}"
+    - "{{ ca_cert_file }}"
+
+- name: Copy certificates to remote servers
+  ansible.builtin.copy:
+    src: "{{ kubelet_cert_local_dir }}/{{ inventory_hostname }}.{{ item }}"
+    dest: "{{ kubelet_cert_dir }}/kubelet.{{ item }}"
+  with_items:
+    - "key"
+    - "crt"
+

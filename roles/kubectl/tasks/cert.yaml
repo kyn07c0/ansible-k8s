@@ -1,0 +1,57 @@
+---
+
+- name: Create cert directory
+  file:
+    path: "{{ kubectl_cert_local_dir }}"
+    state: directory
+  delegate_to: "localhost"
+
+- name: Generate private key for component
+  community.crypto.openssl_privatekey:
+    path: "{{ kubectl_cert_local_dir }}/{{ kubectl_admin_cert_key_file }}"
+    size: "{{ key_size }}"
+    type: "{{ key_type }}"
+  delegate_to: "localhost"
+
+- name: Generate a certificate signing request with subject information
+  community.crypto.openssl_csr:
+    path: "{{ kubectl_cert_local_dir }}/admin.csr"
+    privatekey_path: "{{ kubectl_cert_local_dir }}/{{ kubectl_admin_cert_key_file }}"
+    basic_constraints: "CA:FALSE"
+    extended_key_usage:
+      - clientAuth
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    key_usage_critical: true
+    common_name: "admin"
+    organization_name: "system:masters"
+    country_name: "{{ country_name }}"
+    state_or_province_name: "{{ state_or_province_name }}"
+    locality_name: "{{ locality_name }}"
+    use_common_name_for_san: false
+    create_subject_key_identifier: yes
+  delegate_to: "localhost"
+
+- name: Generate a certificate
+  community.crypto.x509_certificate:
+    path: "{{ kubectl_cert_local_dir }}/{{ kubectl_admin_cert_file }}"
+    privatekey_path: "{{ kubectl_cert_local_dir }}/{{ kubectl_admin_cert_key_file }}"
+    csr_path: "{{ kubectl_cert_local_dir }}/admin.csr"
+    ownca_path: "{{ kubectl_cert_local_dir }}/{{ ca_cert_file }}"
+    ownca_privatekey_path: "{{ kubectl_cert_local_dir }}/{{ ca_key_file }}"
+    provider: ownca
+  delegate_to: "localhost"
+
+- name: Create remote cert directory
+  file:
+    path: "{{ kubectl_cert_dir }}"
+    state: directory
+
+- name: Copy private key and self signed certificate to remote servers
+  copy:
+    src: "{{ kubectl_cert_local_dir }}/{{ item }}"
+    dest: "{{ kubectl_cert_dir }}/{{ item }}"
+  loop:
+    - "{{ kubectl_admin_cert_file }}"
+    - "{{ kubectl_admin_cert_key_file }}"

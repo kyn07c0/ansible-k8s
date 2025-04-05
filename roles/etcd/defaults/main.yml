@@ -1,0 +1,10 @@
+---
+
+etcd_version: 3.5.19
+
+etcd_extract_dir: /opt
+etcd_binary_dir: /usr/local/bin
+etcd_data_dir: /var/lib/etcd
+
+etcd_install_mode: network
+etcd_local_binary_dir: /home/yura/k8s/binary

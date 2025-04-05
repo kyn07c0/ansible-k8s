@@ -1,0 +1,47 @@
+---
+
+- name: Is runc installed
+  ansible.builtin.stat:
+    path: "{{ runc_extract_dir }}/runc-{{ runc_version }}/runc"
+  register: runc_file_found
+
+- block:
+
+  - name: Create runc directory
+    ansible.builtin.file:
+      path: "{{ runc_extract_dir }}/runc-{{ runc_version }}"
+      state: directory
+
+  - shell: uname -s
+    register: os
+
+  - shell: dpkg --print-architecture
+    register: architecture
+
+  - name: Download runc from network
+    ansible.builtin.get_url:
+      url: "https://github.com/opencontainers/runc/releases/download/v{{ runc_version }}/runc.{{ architecture.stdout }}"
+      dest: "{{ runc_extract_dir }}/runc-{{ runc_version }}"
+    when:
+      - runc_install_mode == 'network'
+
+  - name: Download runc from local dir
+    ansible.builtin.copy:
+      src: "{{ runc_local_binary_dir }}/runc.{{ architecture.stdout }}"
+      dest: "{{ runc_extract_dir }}/runc-{{ runc_version }}"
+    when:
+      - runc_install_mode == 'local'
+
+  - name: Remane runc.amd64 to runc
+    ansible.builtin.command: >
+      mv {{ runc_extract_dir }}/runc-{{ runc_version }}/runc.{{ architecture.stdout }} {{ runc_extract_dir }}/runc-{{ runc_version }}/runc
+
+  - name: Create symlinks to /usr/local/bin
+    ansible.builtin.file:
+      src: "{{ runc_extract_dir }}/runc-{{ runc_version }}/runc"
+      path: "{{ runc_binary_dir }}/runc"
+      state: link
+      mode: u+x
+
+  when:
+    - not runc_file_found.stat.exists

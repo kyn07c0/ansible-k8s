@@ -1,0 +1,45 @@
+---
+
+- name: Is kube-apiserver installed
+  ansible.builtin.stat:
+    path: "{{ kube_apiserver_extract_dir }}/kube-apiserver-{{ kube_apiserver_version }}/kube-apiserver"
+  register: kube_apiserver_file_found
+
+- block:
+
+  - name: Create kube-apiserver directory
+    ansible.builtin.file:
+      path: "{{ kube_apiserver_extract_dir }}/kube-apiserver-{{ kube_apiserver_version }}"
+      state: directory
+
+  - shell: uname -s
+    register: os
+
+  - shell: dpkg --print-architecture
+    register: architecture
+
+  - name: Install kube-apiserver from url
+    ansible.builtin.get_url:
+      url: "https://dl.k8s.io/v{{ kube_apiserver_version }}/bin/{{ os.stdout | lower }}/{{ architecture.stdout }}/kube-apiserver"
+      dest: "{{ kube_apiserver_extract_dir }}/kube-apiserver-{{ kube_apiserver_version }}"
+      mode: u+x
+    when:
+      - kube_apiserver_install_mode == 'network'
+
+  - name: Install kube-apiserver from local dir
+    ansible.builtin.copy:
+      src: "{{ kube_apiserver_local_binary_dir }}/kube-apiserver"
+      dest: "{{ kube_apiserver_extract_dir }}/kube-apiserver-{{ kube_apiserver_version }}"
+      mode: u+x
+    when:
+      - kube_apiserver_install_mode == 'local'
+
+  - name: Create symlinks to /usr/local/bin
+    ansible.builtin.file:
+      src: "{{ kube_apiserver_extract_dir }}/kube-apiserver-{{ kube_apiserver_version }}/kube-apiserver"
+      path: "{{ kube_apiserver_binary_dir }}/kube-apiserver"
+      state: link
+      mode: a+x
+
+  when:
+    - not kube_apiserver_file_found.stat.exists

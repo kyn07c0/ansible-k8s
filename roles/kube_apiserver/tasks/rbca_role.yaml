@@ -1,0 +1,39 @@
+---
+
+- name: Ganerate config admin (set cluster)
+  ansible.builtin.command: >
+    kubectl config set-cluster k8s
+    --certificate-authority={{ cert_dir }}/{{ ca_cert_file }}
+    --embed-certs=true
+    --server=https://127.0.0.1:6443
+    --kubeconfig={{ kube_apiserver_kubeconf_dir }}/admin.kubeconfig
+
+- name: Ganerate config admin (set credentials)
+  ansible.builtin.command: >
+    kubectl config set-credentials admin
+    --client-certificate={{ cert_dir }}/{{ admin_cert_file }}
+    --client-key={{ cert_dir }}/{{ admin_cert_key_file }}
+    --embed-certs=true
+    --kubeconfig={{ kube_apiserver_kubeconf_dir }}/admin.kubeconfig
+
+- name: Ganerate config admin (set context)
+  ansible.builtin.command: >
+    kubectl config set-context default
+    --cluster=k8s
+    --user=admin
+    --kubeconfig={{ kube_apiserver_kubeconf_dir }}/admin.kubeconfig
+
+- name: Set default context for admin config
+  ansible.builtin.command: >
+    kubectl config use-context default
+    --kubeconfig={{ kube_apiserver_kubeconf_dir }}/admin.kubeconfig
+
+- name: Copy role configuration
+  ansible.builtin.template:
+    src: kube-apiserver-to-kubelet.yaml.j2
+    dest: "{{ kube_apiserver_conf_dir }}/kube-apiserver-to-kubelet.yaml"
+
+- name: Ganerate role
+  ansible.builtin.command: >
+    kubectl apply -f {{ kube_apiserver_conf_dir }}/kube-apiserver-to-kubelet.yaml
+    --kubeconfig {{ kube_apiserver_kubeconf_dir }}/admin.kubeconfig

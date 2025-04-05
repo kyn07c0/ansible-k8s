@@ -1,0 +1,12 @@
+---
+- ansible.builtin.include_tasks:
+    file: cert.yaml
+
+- ansible.builtin.include_tasks:
+    file: install.yaml
+
+- ansible.builtin.include_tasks:
+    file: kubeconfig.yaml
+
+- ansible.builtin.include_tasks:
+    file: service.yaml

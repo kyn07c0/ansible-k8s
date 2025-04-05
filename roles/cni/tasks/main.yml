@@ -1,0 +1,62 @@
+---
+
+- name: Is cni plugins installed
+  ansible.builtin.stat:
+    path: "{{ cni_binary_dir }}"
+  register: cni_file_found
+
+- block:
+
+  - name: Create cni plugins directory
+    ansible.builtin.file:
+      path: "{{ cni_binary_dir }}"
+      state: directory
+
+  - shell: uname -s
+    register: os
+
+  - shell: dpkg --print-architecture
+    register: architecture
+
+  - name: Download cni plugins
+    ansible.builtin.unarchive:
+      src: "https://github.com/containernetworking/plugins/releases/download/v{{ cni_version }}/cni-plugins-{{ os.stdout | lower }}-{{ architecture.stdout }}-v{{ cni_version }}.tgz"
+      dest: "{{ cni_binary_dir }}"
+      remote_src: yes
+    when:
+      - cni_install_mode == 'network'
+
+  - name: Download kubectl from local dir
+    ansible.builtin.unarchive:
+      src: "{{ cni_local_binary_dir }}/cni-plugins-{{ os.stdout | lower }}-{{ architecture.stdout }}-v{{ cni_version }}.tgz"
+      dest: "{{ cni_binary_dir }}"
+    when:
+      - cni_install_mode == 'local'
+
+  when:
+    - not cni_file_found.stat.exists
+
+- name: Is cni config directory
+  ansible.builtin.stat:
+    path: "{{ cni_config_dir }}"
+  register: is_cni_config_dir
+
+- block:
+
+  - name: Create cni config directory
+    ansible.builtin.file:
+      path: "{{ cni_config_dir }}"
+      state: directory
+
+  - name: copy bridge config
+    ansible.builtin.template:
+      src: bridge.conf.j2
+      dest: "{{ cni_config_dir }}/bridge.conf"
+
+  - name: copy loopback config
+    ansible.builtin.template:
+      src: loopback.conf.j2
+      dest: "{{ cni_config_dir }}/loopback.conf"
+
+  when:
+    - not is_cni_config_dir.stat.exists

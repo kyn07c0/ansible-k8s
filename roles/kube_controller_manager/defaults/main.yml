@@ -1,0 +1,26 @@
+---
+
+kube_controller_manager_version: 1.30.0
+
+kube_controller_manager_extract_dir: /opt
+kube_controller_manager_binary_dir: /usr/local/bin
+
+kube_controller_manager_cert_local_dir: /home/yura/ssl
+kube_controller_manager_cert_dir: /etc/kubernetes/pki
+kube_controller_manager_cert_key_file: kube-controller-manager.key
+kube_controller_manager_cert_file: kube-controller-manager.crt
+service_account_cert_key_file: service-account.key
+service_account_cert_file: service-account.crt
+ca_cert_file: ca.crt
+ca_key_file: ca.key
+
+kube_controller_manager_install_mode: network
+kube_controller_manager_local_binary_dir: /home/yura/k8s/binary
+
+kube_controller_manager_kubeconf_dir: /root/.kube
+
+key_size: 4096
+key_type: RSA
+country_name: RU
+state_or_province_name: RUSSIA
+locality_name: Saint-Petersburg

@@ -1,0 +1,26 @@
+---
+
+kubelet_version: 1.30.0
+kubelet_extract_dir: /opt
+kubelet_binary_dir: /usr/local/bin
+kubelet_config_dir: /var/lib/kubelet
+
+kubelet_cert_local_dir: /home/yura/ssl
+kubelet_cert_dir: /etc/kubernetes/pki
+ca_key_file: ca.key
+ca_cert_file: ca.crt
+kubelet_cert_key_file: kubelet.key
+kubelet_cert_file: kubelet.crt
+
+key_size: 4096
+key_type: RSA
+country_name: RU
+state_or_province_name: RUSSIA
+locality_name: Saint-Petersburg
+
+kubelet_install_mode: network
+kubelet_local_binary_dir: /home/yura/k8s/binary
+
+kubelet_kubeconf_dir: /root/.kube
+
+resolv_conf: /etc/resolv.conf

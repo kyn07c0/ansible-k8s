@@ -1,0 +1,31 @@
+---
+
+kube_apiserver_version: 1.30.0
+
+kube_apiserver_extract_dir: /opt
+kube_apiserver_binary_dir: /usr/local/bin
+kube_apiserver_conf_dir: /etc/kubernetes
+
+cert_local_dir: /home/yura/ssl
+cert_dir: /etc/kubernetes/pki
+kube_apiserver_key_file: kube-apiserver.key
+kube_apiserver_cert_file: kube-apiserver.crt
+service_account_key_file: service-account.key
+service_account_cert_file: service-account.crt
+proxy_client_key_file: proxy-client.key
+proxy_client_cert_file: proxy-client.crt
+admin_cert_file: admin.crt
+admin_cert_key_file: admin.key
+ca_cert_file: ca.crt
+ca_key_file: ca.key
+
+kube_apiserver_install_mode: network
+kube_apiserver_local_binary_dir: /home/yura/k8s/binary
+
+kube_apiserver_kubeconf_dir: /root/.kube
+
+key_size: 4096
+key_type: RSA
+country_name: RU
+state_or_province_name: RUSSIA
+locality_name: Saint-Petersburg

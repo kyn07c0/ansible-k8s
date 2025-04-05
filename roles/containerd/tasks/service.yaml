@@ -1,0 +1,25 @@
+---
+
+- name: Install service containerd
+  ansible.builtin.template:
+    src: containerd.service.j2
+    dest: /etc/systemd/system/containerd.service
+  notify:
+    - reload systemd
+
+- name: Enable and start containerd
+  ansible.builtin.systemd:
+    name: containerd
+    state: started
+    enabled: yes
+
+- name: Check started service
+  ansible.builtin.service:
+    name: containerd
+    state: started
+  register: containerd_service_status
+
+- name: Terminate playbook if service is not running
+  ansible.builtin.fail:
+    msg: "The containerd service is not running. Playbook has stoped."
+  when: containerd_service_status.state != 'started'

@@ -1,0 +1,25 @@
+---
+
+kube_scheduler_version: 1.30.0
+
+kube_scheduler_extract_dir: /opt
+kube_scheduler_binary_dir: /usr/local/bin
+kube_scheduler_config_dir: /var/lib/kubernetes
+
+kube_scheduler_cert_local_dir: /home/yura/ssl
+kube_scheduler_cert_dir: /etc/kubernetes/pki
+kube_scheduler_cert_key_file: kube-scheduler.key
+kube_scheduler_cert_file: kube-scheduler.crt
+ca_cert_file: ca.crt
+ca_key_file: ca.key
+
+kube_scheduler_install_mode: network
+kube_scheduler_local_binary_dir: /home/yura/k8s/binary
+
+kube_scheduler_kubeconf_dir: /root/.kube
+
+key_size: 4096
+key_type: RSA
+country_name: RU
+state_or_province_name: RUSSIA
+locality_name: Saint-Petersburg

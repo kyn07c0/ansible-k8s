@@ -1,0 +1,34 @@
+version = 2
+
+[plugins."io.containerd.grpc.v1.cri"]
+{% if containerd_registry_custom_enable %}
+  sandbox_image = "{{ containerd_registry_ip }}:{{ containerd_registry_port }}/pause:{{ containerd_image_pause_version }}"
+{% endif %}
+  [plugins."io.containerd.grpc.v1.cri".containerd]
+    snapshotter = "overlayfs"
+    default_runtime_name = "runc"
+  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+    runtime_type = "io.containerd.runc.v2"
+  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+    SystemdCgroup = true
+[plugins."io.containerd.grpc.v1.cri".cni]
+  bin_dir = "/opt/cni/bin"
+  conf_dir = "/etc/cni/net.d"
+
+{% if containerd_registry_custom_enable  %}
+[plugins."io.containerd.grpc.v1.cri".registry]
+  config_path = ""
+  [plugins."io.containerd.grpc.v1.cri".registry.auths]
+
+  [plugins."io.containerd.grpc.v1.cri".registry.configs]
+    [plugins."io.containerd.grpc.v1.cri".registry.configs."10.100.176.62:8344".tls]
+      insecure_skip_verify = {{ containerd_registry_insecure_skip_verify }}
+    [plugins."io.containerd.grpc.v1.cri".registry.configs."{{ containerd_registry_ip }}:{{ containerd_registry_port }}".auth]
+      auth = "{{ containerd_registry_auth }}"
+
+  [plugins."io.containerd.grpc.v1.cri".registry.headers]
+
+  [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
+    [plugins."io.containerd.grpc.v1.cri".registry.mirrors."{{ containerd_registry_ip }}:{{ containerd_registry_port }}"]
+      endpoint = ["https://{{ containerd_registry_ip }}:{{ containerd_registry_port }}"]
+{% endif %}

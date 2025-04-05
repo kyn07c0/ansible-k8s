@@ -1,0 +1,44 @@
+---
+
+- name: Is crictl installed
+  ansible.builtin.stat:
+    path: "{{ crictl_extract_dir }}/crictl-{{ crictl_version }}/crictl"
+  register: crictl_file_found
+
+- block:
+
+  - name: Create crictl directory
+    ansible.builtin.file:
+      path: "{{ crictl_extract_dir }}/crictl-{{ crictl_version }}"
+      state: directory
+
+  - shell: uname -s
+    register: os
+
+  - shell: dpkg --print-architecture
+    register: architecture
+
+  - name: Download crictl from network
+    ansible.builtin.unarchive:
+      src: "https://github.com/kubernetes-sigs/cri-tools/releases/download/v{{ crictl_version }}/crictl-v{{ crictl_version }}-{{ os.stdout | lower }}-{{ architecture.stdout }}.tar.gz"
+      dest: "{{ crictl_extract_dir }}/crictl-{{ crictl_version }}"
+      remote_src: yes
+    when:
+      - crictl_install_mode == 'network'
+
+  - name: Download kubectl from local dir
+    ansible.builtin.unarchive:
+      src: "{{ crictl_local_binary_dir }}/crictl-v{{ crictl_version }}-{{ os.stdout | lower }}-{{ architecture.stdout }}.tar.gz"
+      dest: "{{ crictl_extract_dir }}/crictl-{{ crictl_version }}"
+    when:
+      - crictl_install_mode == 'local'
+
+  - name: Create symlinks to /usr/local/bin
+    ansible.builtin.file:
+      src: "{{ crictl_extract_dir }}/crictl-{{ crictl_version }}/crictl"
+      path: "{{ crictl_binary_dir }}/crictl"
+      state: link
+      mode: u+x
+
+  when:
+    - not crictl_file_found.stat.exists

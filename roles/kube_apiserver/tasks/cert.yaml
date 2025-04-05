@@ -1,0 +1,142 @@
+---
+
+- name: Create cert directory
+  file:
+    path: "{{ cert_local_dir }}"
+    state: directory
+  delegate_to: "localhost"
+
+- name: Generate private key for kube-apiserver
+  community.crypto.openssl_privatekey:
+    path: "{{ cert_local_dir }}/{{ kube_apiserver_key_file }}"
+    size: "{{ key_size }}"
+    type: "{{ key_type }}"
+  delegate_to: "localhost"
+
+- name: Generate a certificate signing request with subject information for kube-apiserver
+  community.crypto.openssl_csr:
+    path: "{{ cert_local_dir }}/kube-apiserver.csr"
+    privatekey_path: "{{ cert_local_dir }}/{{ kube_apiserver_key_file }}"
+    basic_constraints: "CA:FALSE"
+    extended_key_usage:
+      - clientAuth
+      - serverAuth
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    key_usage_critical: true
+    common_name: "kubernetes"
+    country_name: "{{ country_name }}"
+    state_or_province_name: "{{ state_or_province_name }}"
+    locality_name: "{{ locality_name }}"
+    subject_alt_name: "IP:127.0.0.1,IP:10.32.0.1,IP:{{ ansible_host }},DNS:kubernetes,DNS:kubernetes.default,DNS:kubernetes.default.svc,DNS:kubernetes.default.svc.cluster,DNS:kubernetes.svc.cluster.local,DNS:k8s-master.local,DNS:api-server.kubernetes.local"
+    create_subject_key_identifier: yes
+  delegate_to: "localhost"
+
+- name: Generate a certificate kube-apiserver
+  community.crypto.x509_certificate:
+    path: "{{ cert_local_dir }}/{{ kube_apiserver_cert_file }}"
+    privatekey_path: "{{ cert_local_dir }}/{{ kube_apiserver_key_file }}"
+    csr_path: "{{ cert_local_dir }}/kube-apiserver.csr"
+    ownca_path: "{{ cert_local_dir }}/{{ ca_cert_file }}"
+    ownca_privatekey_path: "{{ cert_local_dir }}/{{ ca_key_file }}"
+    provider: ownca
+  delegate_to: "localhost"
+
+
+
+- name: Generate private key for service-account
+  community.crypto.openssl_privatekey:
+    path: "{{ cert_local_dir }}/{{ service_account_key_file }}"
+    size: "{{ key_size }}"
+    type: "{{ key_type }}"
+  delegate_to: "localhost"
+
+- name: Generate a certificate signing request with subject information for service-account
+  community.crypto.openssl_csr:
+    path: "{{ cert_local_dir }}/service-account.csr"
+    privatekey_path: "{{ cert_local_dir }}/{{ service_account_key_file }}"
+    basic_constraints: "CA:FALSE"
+    extended_key_usage:
+      - clientAuth
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    key_usage_critical: true
+    common_name: "service-account"
+    country_name: "{{ country_name }}"
+    state_or_province_name: "{{ state_or_province_name }}"
+    locality_name: "{{ locality_name }}"
+    use_common_name_for_san: false
+    create_subject_key_identifier: yes
+  delegate_to: "localhost"
+
+- name: Generate a certificate service-account
+  community.crypto.x509_certificate:
+    path: "{{ cert_local_dir }}/{{ service_account_cert_file }}"
+    privatekey_path: "{{ cert_local_dir }}/{{ service_account_key_file }}"
+    csr_path: "{{ cert_local_dir }}/service-account.csr"
+    ownca_path: "{{ cert_local_dir }}/{{ ca_cert_file }}"
+    ownca_privatekey_path: "{{ cert_local_dir }}/{{ ca_key_file }}"
+    provider: ownca
+  delegate_to: "localhost"
+
+
+
+- name: Generate private key for proxy-client
+  community.crypto.openssl_privatekey:
+    path: "{{ cert_local_dir }}/proxy-client.key"
+    size: "{{ key_size }}"
+    type: "{{ key_type }}"
+  delegate_to: "localhost"
+
+- name: Generate a certificate signing request with subject information for proxy-client
+  community.crypto.openssl_csr:
+    path: "{{ cert_local_dir }}/proxy-client.csr"
+    privatekey_path: "{{ cert_local_dir }}/proxy-client.key"
+    basic_constraints: "CA:FALSE"
+    extended_key_usage:
+      - clientAuth
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    key_usage_critical: true
+    common_name: "aggregator"
+    organization_name: "system:masters"
+    organizational_unit_name: "System"
+    country_name: "{{ country_name }}"
+    state_or_province_name: "{{ state_or_province_name }}"
+    locality_name: "{{ locality_name }}"
+    use_common_name_for_san: false
+    create_subject_key_identifier: yes
+  delegate_to: "localhost"
+
+- name: Generate a certificate for proxy-client
+  community.crypto.x509_certificate:
+    path: "{{ cert_local_dir }}/proxy-client.crt"
+    privatekey_path: "{{ cert_local_dir }}/proxy-client.key"
+    csr_path: "{{ cert_local_dir }}/proxy-client.csr"
+    ownca_path: "{{ cert_local_dir }}/{{ ca_cert_file }}"
+    ownca_privatekey_path: "{{ cert_local_dir }}/{{ ca_key_file }}"
+    provider: ownca
+  delegate_to: "localhost"
+
+
+
+- name: Create remote cert directory
+  file:
+    path: "{{ cert_dir }}"
+    state: directory
+
+- name: Copy private key and self signed certificate to remote servers
+  copy:
+    src: "{{ cert_local_dir }}/{{ item }}"
+    dest: "{{ cert_dir }}/{{ item }}"
+  loop:
+    - "{{ kube_apiserver_cert_file }}"
+    - "{{ kube_apiserver_key_file }}"
+    - "{{ service_account_cert_file }}"
+    - "{{ service_account_key_file }}"
+    - "{{ proxy_client_cert_file }}"
+    - "{{ proxy_client_key_file }}"
+

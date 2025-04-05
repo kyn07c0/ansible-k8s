@@ -1,0 +1,69 @@
+---
+
+- name: Disable swap in current session
+  ansible.builtin.command: >
+    swapoff -a
+
+- name: Disable swap after reboot
+  replace:
+    path: /etc/fstab
+    regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+    replace: '# \1'
+
+- name: create resolv.conf file
+  ansible.builtin.file:
+    path: "{{ resolv_conf }}"
+    state: touch
+    mode: "0755"
+
+- name: Create kubelet directories
+  ansible.builtin.file:
+    path: "{{ kubelet_config_dir }}"
+    state: directory
+
+- name: Copy file kubelet config
+  ansible.builtin.template:
+    src: kubelet-config.yaml.j2
+    dest: "{{ kubelet_config_dir }}/kubelet-config.yaml"
+
+- name: Checking the installation of kubelet
+  ansible.builtin.stat:
+    path: "{{ kubelet_extract_dir }}/kubelet-{{ kubelet_version }}/kubelet"
+  register: kubelet_file_found
+
+- block:
+
+  - name: Create kubelet directory
+    ansible.builtin.file:
+      path: "{{ kubelet_extract_dir }}/kubelet-{{ kubelet_version }}"
+      state: directory
+
+  - shell: uname -s
+    register: os
+
+  - shell: dpkg --print-architecture
+    register: architecture
+
+  - name: Download kubelet from network
+    ansible.builtin.get_url:
+      url: "https://dl.k8s.io/v{{ kubelet_version }}/bin/{{ os.stdout | lower }}/{{ architecture.stdout }}/kubelet"
+      dest: "{{ kubelet_extract_dir }}/kubelet-{{ kubelet_version }}"
+    when:
+      - kubelet_install_mode == 'network'
+
+  - name: Download kubelet from local dir
+    ansible.builtin.copy:
+      src: "{{ kubelet_local_binary_dir }}/kubelet"
+      dest: "{{ kubelet_extract_dir }}/kubelet-{{ kubelet_version }}"
+    when:
+      - kubelet_install_mode == 'local'
+
+  - name: Create symlinks to /usr/local/bin
+    ansible.builtin.file:
+      src: "{{ kubelet_extract_dir }}/kubelet-{{ kubelet_version }}/kubelet"
+      path: "{{ kubelet_binary_dir }}/kubelet"
+      state: link
+      mode: u+x
+
+  when:
+    - not kubelet_file_found.stat.exists

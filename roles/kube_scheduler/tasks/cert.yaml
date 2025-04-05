@@ -1,0 +1,60 @@
+---
+
+- name: Generate private key for component
+  community.crypto.openssl_privatekey:
+    path: "{{ kube_scheduler_cert_local_dir }}/{{ kube_scheduler_cert_key_file }}"
+    size: "{{ key_size }}"
+    type: "{{ key_type }}"
+  delegate_to: "localhost"
+
+- name: Generate a certificate signing request with subject information
+  community.crypto.openssl_csr:
+    path: "{{ kube_scheduler_cert_local_dir }}/kube-scheduler.csr"
+    privatekey_path: "{{ kube_scheduler_cert_local_dir }}/{{ kube_scheduler_cert_key_file }}"
+    basic_constraints: "CA:FALSE"
+    extended_key_usage:
+      - clientAuth
+      - serverAuth
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    key_usage_critical: true
+    common_name: "system:kube-scheduler"
+    organization_name: "system:kube-scheduler"
+    country_name: "{{ country_name }}"
+    state_or_province_name: "{{ state_or_province_name }}"
+    locality_name: "{{ locality_name }}"
+    subject_alt_name: "DNS:kube-scheduler,IP:127.0.0.1"
+    create_subject_key_identifier: yes
+  delegate_to: "localhost"
+
+- name: Generate a certificate
+  community.crypto.x509_certificate:
+    path: "{{ kube_scheduler_cert_local_dir }}/{{ kube_scheduler_cert_file }}"
+    privatekey_path: "{{ kube_scheduler_cert_local_dir }}/{{ kube_scheduler_cert_key_file }}"
+    csr_path: "{{ kube_scheduler_cert_local_dir }}/kube-scheduler.csr"
+    ownca_path: "{{ kube_scheduler_cert_local_dir }}/{{ ca_cert_file }}"
+    ownca_privatekey_path: "{{ kube_scheduler_cert_local_dir }}/{{ ca_key_file }}"
+    provider: ownca
+  delegate_to: "localhost"
+
+- name: Create remote cert directory
+  file:
+    path: "{{ kube_scheduler_cert_dir }}"
+    state: directory
+
+- name: Copy ca certificates
+  ansible.builtin.copy:
+    src: "{{ kube_scheduler_cert_local_dir }}/{{ item }}"
+    dest: "{{ kube_scheduler_cert_dir }}"
+  with_items:
+    - "{{ ca_key_file }}"
+    - "{{ ca_cert_file }}"
+
+- name: Copy private key and certificate to remote servers
+  copy:
+    src: "{{ kube_scheduler_cert_local_dir }}/{{ item }}"
+    dest: "{{ kube_scheduler_cert_dir }}/{{ item }}"
+  loop:
+    - "{{ kube_scheduler_cert_file }}"
+    - "{{ kube_scheduler_cert_key_file }}"

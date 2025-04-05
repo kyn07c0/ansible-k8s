@@ -1,0 +1,17 @@
+---
+
+containerd_version: 1.7.16
+
+containerd_extract_dir: /opt
+containerd_binary_dir: /bin
+containerd_config_dir: /etc/containerd
+
+containerd_install_mode: network
+containerd_local_binary_dir: /home/yura/k8s/binary
+
+containerd_registry_custom_enable: false
+containerd_registry_ip: 10.100.176.62
+containerd_registry_port: 8344
+containerd_registry_insecure_skip_verify: "true"
+containerd_registry_auth: YWRtaW46eHlUY1YzUTc=
+containerd_image_pause_version: 3.8

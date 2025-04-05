@@ -1,0 +1,26 @@
+---
+
+- name: Install service etcd
+  ansible.builtin.template:
+    src: etcd.service.j2
+    dest: /etc/systemd/system/etcd.service
+    mode: '0644'
+  notify:
+    - reload systemd
+
+- name: Enable and start etcd service
+  ansible.builtin.systemd:
+    name: etcd
+    state: started
+    enabled: yes
+
+- name: Check started service
+  ansible.builtin.service:
+    name: etcd
+    state: started
+  register: etcd_service_status
+
+- name: Terminate playbook if service is not running
+  ansible.builtin.fail:
+    msg: "The etcd service is not running. Playbook has stoped."
+  when: etcd_service_status.state != 'started'

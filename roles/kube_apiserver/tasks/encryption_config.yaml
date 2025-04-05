@@ -1,0 +1,15 @@
+---
+
+- name: Create config directory
+  file:
+    path: "{{ kube_apiserver_conf_dir }}"
+    state: directory
+
+- name: Generate an encryption key
+  set_fact:
+    encryption_key: "{{ lookup('community.general.random_string', length=32, base64=True) }}"
+
+- name: Create the encryption config file
+  ansible.builtin.template:
+    src: encryption-config.yaml.j2
+    dest: "{{ kube_apiserver_conf_dir }}/encryption-config.yaml"

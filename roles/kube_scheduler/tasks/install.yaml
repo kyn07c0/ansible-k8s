@@ -1,0 +1,55 @@
+---
+
+- name: Create kube-scheduler config directory
+  ansible.builtin.file:
+    path: "{{ kube_scheduler_config_dir }}"
+    state: directory
+
+- name: Copy file kube-scheduler config
+  ansible.builtin.template:
+    src: kube_scheduler_config.yaml.j2
+    dest: "{{ kube_scheduler_config_dir }}/kube-scheduler-config.yaml"
+
+- name: Is kube-scheduler installed
+  ansible.builtin.stat:
+    path: "{{ kube_scheduler_extract_dir }}/kube-scheduler-{{ kube_scheduler_version }}/kube-scheduler"
+  register: kube_scheduler_file_found
+
+- block:
+
+  - name: Create kube-scheduler directory
+    ansible.builtin.file:
+      path: "{{ kube_scheduler_extract_dir }}/kube-scheduler-{{ kube_scheduler_version }}"
+      state: directory
+
+  - shell: uname -s
+    register: os
+
+  - shell: dpkg --print-architecture
+    register: architecture
+
+  - name: Install kube-scheduler from url
+    ansible.builtin.get_url:
+      url: "https://dl.k8s.io/v{{ kube_scheduler_version }}/bin/{{ os.stdout | lower }}/{{ architecture.stdout }}/kube-scheduler"
+      dest: "{{ kube_scheduler_extract_dir }}/kube-scheduler-{{ kube_scheduler_version }}"
+      mode: u+x
+    when:
+      - kube_scheduler_install_mode == 'network'
+
+  - name: Install kube-scheduler from local dir
+    ansible.builtin.copy:
+      src: "{{ kube_scheduler_local_binary_dir }}/kube-scheduler"
+      dest: "{{ kube_scheduler_extract_dir }}/kube-scheduler-{{ kube_scheduler_version }}"
+      mode: u+x
+    when:
+      - kube_scheduler_install_mode == 'local'
+
+  - name: Create symlinks to /usr/local/bin
+    ansible.builtin.file:
+      src: "{{ kube_scheduler_extract_dir }}/kube-scheduler-{{ kube_scheduler_version }}/kube-scheduler"
+      path: "{{ kube_scheduler_binary_dir }}/kube-scheduler"
+      state: link
+      mode: a+x
+
+  when:
+    - not kube_scheduler_file_found.stat.exists

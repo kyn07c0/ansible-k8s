@@ -1,0 +1,16 @@
+---
+
+- ansible.builtin.include_tasks:
+    file: cert.yaml
+
+- ansible.builtin.include_tasks:
+    file: encryption_config.yaml
+
+- ansible.builtin.include_tasks:
+    file: install.yaml
+
+- ansible.builtin.include_tasks:
+    file: service.yaml
+
+- ansible.builtin.include_tasks:
+    file: rbca_role.yaml

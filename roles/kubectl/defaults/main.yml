@@ -1,0 +1,20 @@
+---
+
+kubectl_version: 1.30.0
+kubectl_binary_dir: /usr/local/bin
+
+kubectl_cert_local_dir: /home/yura/ssl
+kubectl_cert_dir: /etc/kubernetes/pki
+kubectl_admin_cert_file: admin.crt
+kubectl_admin_cert_key_file: admin.key
+ca_cert_file: ca.crt
+ca_key_file: ca.key
+
+kubectl_install_mode: network
+kubectl_local_binary_dir: /home/yura/k8s/binary
+
+key_size: 4096
+key_type: RSA
+country_name: RU
+state_or_province_name: RUSSIA
+locality_name: Saint-Petersburg
