@@ -14,13 +14,13 @@
 A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
 Роль имеет следующие переменные:  
 | Переменная | Описание | Значение по умолчанию |
-|---|---|---|
-| etcd_version           | | 3.5.19 |
-| etcd_extract_dir       | | /opt   |
-| etcd_binary_dir        | | /usr/local/bin |
-| etcd_data_dir          | | /var/lib/etcd |
-| etcd_install_mode      | | network |
-| etcd_local_binary_dir  | | /home/yura/k8s/binary |
+|------------------------|-----------------------------------------------------|-----------------------|
+| etcd_version           | Версия etcd для установки.                          | 3.5.19                |
+| etcd_extract_dir       | Директория для извлечения архива etci.              | /opt                  |
+| etcd_binary_dir        | Директория для размещения бинарных файлов etcd.     | /usr/local/bin        |
+| etcd_data_dir          | Директория для хранения данных etcd.                | /var/lib/etcd         |
+| etcd_install_mode      | Режим загрузки архива etcd (network, local).        | network               |
+| etcd_local_binary_dir  | Расположение архива etcd для режима загрузки local. | /home/yura/k8s/binary |
 
 Зависимости
 ------------
