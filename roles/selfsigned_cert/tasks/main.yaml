@@ -5,6 +5,7 @@
     path: "{{ cert_local_dir }}"
     state: directory
   delegate_to: "localhost"
+  become: false
 
 - name: Generate private key
   community.crypto.openssl_privatekey:
@@ -13,6 +14,7 @@
     type: "{{ key_type }}"
     backup: yes
   delegate_to: "localhost"
+  become: false
 
 - name: Generate certificate signing request with subject information
   community.crypto.openssl_csr:
@@ -28,6 +30,7 @@
     state_or_province_name: "{{ state_or_province_name }}"
     locality_name: "{{ locality_name }}"
   delegate_to: "localhost"
+  become: false
 
 - name: Generate a self signed certificate
   community.crypto.x509_certificate:
@@ -36,6 +39,7 @@
     csr_path: "{{ cert_local_dir }}/{{ cert_request_file }}"
     provider: selfsigned
   delegate_to: "localhost"
+  become: false
 
 - name: Create remote cert directory
   file:

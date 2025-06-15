@@ -1,0 +1,181 @@
+---
+
+- name: Check for existence of CA file
+  stat:
+    path: "{{ cert_dir }}/{{ ca_cert_file }}"
+  register: ca_file_status
+
+- name: Stop playbook if file does not exist
+  fail:
+    msg: "file {{ cert_dir }}/{{ ca_cert_file }} does not exist. Playbook stopped."
+  when: not ca_file_status.stat.exists
+
+- name: Create directory for etcd certificates
+  ansible.builtin.file:
+    path: "{{ cert_dir }}/etcd"
+    state: directory
+
+
+#################################################
+# Create a etcd server certificate
+################################################
+
+- name: Generate private key for etcd
+  community.crypto.openssl_privatekey:
+    path: "{{ cert_dir }}/etcd/server.key"
+    size: "{{ key_size }}"
+    type: "{{ key_type }}"
+
+- name: Generate CSR for server certificate
+  community.crypto.openssl_csr:
+    path: "{{ cert_dir }}/etcd/server.csr"
+    privatekey_path: "{{ cert_dir }}/etcd/server.key"
+    basic_constraints_critical: yes
+    basic_constraints: "CA:FALSE"
+    extended_key_usage_critical: yes
+    extended_key_usage:
+      - "clientAuth"
+      - "serverAuth"
+    key_usage_critical: yes
+    key_usage:
+      - "digitalSignature"
+      - "keyEncipherment"
+    common_name: "system:etcd-server"
+    organization_name: "system:etcd-server"
+    country_name: "{{ country_name }}"
+    state_or_province_name: "{{ state_or_province_name }}"
+    locality_name: "{{ locality_name }}"
+    subject_alt_name: >-
+      [ 
+        "IP:127.0.0.1",
+        "DNS:localhost"
+        {% for ip in etcd_ips %},
+        "IP:{{ ip }}"
+        {% endfor %}
+        {% for dns in etcd_dns_names %},
+        "DNS:{{ dns }}"
+        {% endfor %}
+      ]
+    create_subject_key_identifier: yes
+  register: etcd_csr
+
+- name: Generate a certificate
+  community.crypto.x509_certificate:
+    path: "{{ cert_dir }}/etcd/server.crt"
+    privatekey_path: "{{ cert_dir }}/etcd/server.key"
+    csr_path: "{{ cert_dir }}/etcd/server.csr"
+    ownca_path: "{{ cert_dir }}/{{ ca_cert_file }}"
+    ownca_privatekey_path: "{{ cert_dir }}/{{ ca_key_file }}"
+    provider: ownca
+    ownca_not_after: "+{{ cert_expiry_days }}d"
+  when: etcd_csr is changed
+
+
+#################################################
+# Create a peer certificate
+################################################
+
+- name: Generate private key for etcd peer communication
+  community.crypto.openssl_privatekey:
+    path: "{{ cert_dir }}/etcd/peer.key"
+    size: "{{ key_size }}"
+    type: "{{ key_type }}"
+
+- name: Generate CSR for server certificate
+  community.crypto.openssl_csr:
+    path: "{{ cert_dir }}/etcd/peer.csr"
+    privatekey_path: "{{ cert_dir }}/etcd/peer.key"
+    basic_constraints_critical: yes
+    basic_constraints: "CA:FALSE"
+    extended_key_usage_critical: yes
+    extended_key_usage:
+      - "clientAuth"
+      - "serverAuth"
+    key_usage_critical: yes
+    key_usage:
+      - "digitalSignature"
+      - "keyEncipherment"
+    common_name: "system:etcd-peer"
+    organization_name: "system:etcd-peer"
+    country_name: "{{ country_name }}"
+    state_or_province_name: "{{ state_or_province_name }}"
+    locality_name: "{{ locality_name }}"
+    subject_alt_name: >-
+      [ 
+        "IP:127.0.0.1",
+        "DNS:localhost"
+        {% for ip in etcd_ips %},
+        "IP:{{ ip }}"
+        {% endfor %}
+        {% for dns in etcd_dns_names %},
+        "DNS:{{ dns }}"
+        {% endfor %}
+      ]
+    create_subject_key_identifier: yes
+  register: etcd_peer_csr
+
+- name: Generate a certificate
+  community.crypto.x509_certificate:
+    path: "{{ cert_dir }}/etcd/peer.crt"
+    privatekey_path: "{{ cert_dir }}/etcd/peer.key"
+    csr_path: "{{ cert_dir }}/etcd/peer.csr"
+    ownca_path: "{{ cert_dir }}/{{ ca_cert_file }}"
+    ownca_privatekey_path: "{{ cert_dir }}/{{ ca_key_file }}"
+    provider: ownca
+    ownca_not_after: "+{{ cert_expiry_days }}d"
+  when: etcd_peer_csr is changed
+
+
+#################################################
+# Create a etcd client certificate
+################################################
+
+- name: Generate private key for etcd client certificate
+  community.crypto.openssl_privatekey:
+    path: "{{ cert_dir }}/etcd/client.key"
+    size: "{{ key_size }}"
+    type: "{{ key_type }}"
+
+- name: Generate CSR for etcd client certificate
+  community.crypto.openssl_csr:
+    path: "{{ cert_dir }}/etcd/client.csr"
+    privatekey_path: "{{ cert_dir }}/etcd/client.key"
+    basic_constraints_critical: yes
+    basic_constraints: "CA:FALSE"
+    extended_key_usage_critical: yes
+    extended_key_usage:
+      - "clientAuth"
+      - "serverAuth"
+    key_usage_critical: yes
+    key_usage:
+      - "digitalSignature"
+      - "keyEncipherment"
+    common_name: "system:etcd-client"
+    organization_name: "system:etcd-client"
+    country_name: "{{ country_name }}"
+    state_or_province_name: "{{ state_or_province_name }}"
+    locality_name: "{{ locality_name }}"
+    subject_alt_name: >-
+      [ 
+        "IP:127.0.0.1",
+        "DNS:localhost"
+        {% for ip in etcd_ips %},
+        "IP:{{ ip }}"
+        {% endfor %}
+        {% for dns in etcd_dns_names %},
+        "DNS:{{ dns }}"
+        {% endfor %}
+      ]
+    create_subject_key_identifier: yes
+  register: etcd_client_csr
+
+- name: Generate a certificate
+  community.crypto.x509_certificate:
+    path: "{{ cert_dir }}/etcd/client.crt"
+    privatekey_path: "{{ cert_dir }}/etcd/client.key"
+    csr_path: "{{ cert_dir }}/etcd/client.csr"
+    ownca_path: "{{ cert_dir }}/{{ ca_cert_file }}"
+    ownca_privatekey_path: "{{ cert_dir }}/{{ ca_key_file }}"
+    provider: ownca
+    ownca_not_after: "+{{ cert_expiry_days }}d"
+  when: etcd_client_csr is changed

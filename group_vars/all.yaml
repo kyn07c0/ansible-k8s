@@ -1,3 +1,14 @@
 ---
 
-domain_name: local
+domain_name:  local
+
+cert_dir:     "/etc/kubernetes/pki"
+ca_key_file:  "ca.key"
+ca_cert_file: "ca.crt"
+cert_expiry_days: 1000
+key_size: 4096
+key_type: RSA
+country_name: RU
+state_or_province_name: RUSSIA
+locality_name: Saint-Petersburg
+

@@ -1,0 +1,13 @@
+---
+
+- ansible.builtin.include_tasks:
+    file: hostname.yaml
+
+- ansible.builtin.include_tasks:
+    file: swap.yaml
+
+- ansible.builtin.include_tasks:
+    file: packages.yaml
+
+- ansible.builtin.include_tasks:
+    file: sysctl.yaml

@@ -1,0 +1,10 @@
+---
+
+- name: Install packages
+  ansible.builtin.package:
+    name:
+      - iptables
+      - python3-cryptography
+    state: present
+    update_cache: yes
+

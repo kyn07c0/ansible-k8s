@@ -16,7 +16,7 @@ all:
         k8s-worker2:
           ansible_host: 192.168.88.33
           pod_subnet: 192.168.2.0/24
-        #k8s-worker3:
-        #  ansible_host: 192.168.88.34
-        #  pod_subnet: 192.168.3.0/24
+#        k8s-worker3:
+#          ansible_host: 192.168.88.24
+#          pod_subnet: 192.168.3.0/24
 

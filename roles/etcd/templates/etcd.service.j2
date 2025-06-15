@@ -1,20 +1,40 @@
 [Unit]
 Description=etcd
 Documentation=https://github.com/etcd-io/etcd
+After=network.target
 
 [Service]
 Type=notify
-Environment="ETCD_UNSUPPORTED_ARCH=amd64"
 ExecStart={{ etcd_binary_dir }}/etcd \
-  --name controller \
-  --initial-advertise-peer-urls http://127.0.0.1:2380 \
-  --listen-peer-urls http://127.0.0.1:2380 \
-  --listen-client-urls http://127.0.0.1:2379 \
-  --advertise-client-urls http://127.0.0.1:2379 \
-  --initial-cluster-token etcd-cluster-0 \
-  --initial-cluster controller=http://127.0.0.1:2380 \
-  --initial-cluster-state new \
-  --data-dir={{ etcd_data_dir }}
+  # Identification
+  --name=etcd_{{ inventory_hostname }} \
+  --data-dir={{ etcd_data_dir }} \
+  # Client settings
+  --listen-client-urls https://127.0.0.1:2379,https://{{ ansible_host }}:2379 \
+  --advertise-client-urls https://{{ ansible_host }}:2379 \
+  --client-cert-auth=true \
+  --trusted-ca-file={{ cert_dir }}/ca.crt \
+  --cert-file={{ cert_dir }}/etcd/server.crt \
+  --key-file={{ cert_dir }}/etcd/server.key \
+  # Peer settings (communication between etcd nodes)
+  --listen-peer-urls https://{{ ansible_host }}:2380 \
+  --initial-advertise-peer-urls https://{{ ansible_host }}:2380 \
+  --peer-client-cert-auth=true \
+  --peer-trusted-ca-file={{ cert_dir }}/ca.crt \
+  --peer-cert-file={{ cert_dir }}/etcd/peer.crt \
+  --peer-key-file={{ cert_dir }}/etcd/peer.key \
+  # Cluster settings
+  --initial-cluster {{ etcd_cluster_list }} \
+  --initial-cluster-state={% if is_initial_run %}new{% else %}existing{% endif %} \
+  --initial-cluster-token etcd-cluster-1 \
+  # Performance tuning
+  --heartbeat-interval=250 \
+  --election-timeout=2000 \
+  --snapshot-count=10000 \
+  --max-snapshots=5 \
+  --max-wals=5 \
+  --auto-compaction-retention=1
+
 Restart=on-failure
 RestartSec=5
 

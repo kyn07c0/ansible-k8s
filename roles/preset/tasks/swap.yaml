@@ -1,0 +1,12 @@
+---
+
+- name: Disable swap in current session
+  ansible.builtin.command: >
+    swapoff -a
+
+- name: Disable swap after reboot
+  replace:
+    path: /etc/fstab
+    regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+    replace: '# \1'
+

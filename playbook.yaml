@@ -1,13 +1,12 @@
 ---
 
-- name: hostname
+- name: preset
   hosts:
-    - admin
     - master
     - worker
   roles:
-    - hostname
-  tags: hostname
+    - preset
+  tags: preset
 
 - name: selfsigned_cert
   hosts:
@@ -16,7 +15,7 @@
     - worker
   roles:
     - selfsigned_cert
-  tags: selfsigned-cert
+  tags: selfsigned_cert
 
 - name: kubectl
   hosts:

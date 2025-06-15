@@ -1,18 +1,25 @@
 ---
 
+- name: Set cluster list
+  set_fact:
+    etcd_cluster_list: "{{ etcd_dns_names | map('regex_replace', '^', 'etcd_') | zip(etcd_ips) | map('join', '=https://') | map('regex_replace', '$', ':2380') | join(',') }}"
+
+- name: Check if etcd is already initialized
+  ansible.builtin.stat:
+    path: "{{ etcd_data_dir }}/member/snap/db"
+  register: etcd_data
+  changed_when: false
+
 - name: Install service etcd
   ansible.builtin.template:
     src: etcd.service.j2
     dest: /etc/systemd/system/etcd.service
     mode: '0644'
+  vars:
+    is_initial_run: "{{ not etcd_data.stat.exists }}"
   notify:
     - reload systemd
-
-- name: Enable and start etcd service
-  ansible.builtin.systemd:
-    name: etcd
-    state: started
-    enabled: yes
+    - restart etcd
 
 - name: Check started service
   ansible.builtin.service:
@@ -24,3 +31,14 @@
   ansible.builtin.fail:
     msg: "The etcd service is not running. Playbook has stoped."
   when: etcd_service_status.state != 'started'
+
+- name: Verify etcd cluster health
+  command: etcdctl --endpoints=https://127.0.0.1:2379 --cacert=/etc/kubernetes/pki/ca.crt --cert=/etc/kubernetes/pki/etcd/client.crt --key=/etc/kubernetes/pki/etcd/client.key endpoint health
+  register: etcd_health
+  changed_when: false
+  ignore_errors: yes
+
+- name: Log etcd health status
+  ansible.builtin.debug:
+    msg: "The etcd cluster health status: {{ etcd_health }}"
+  when: etcd_health.failed

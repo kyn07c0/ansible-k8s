@@ -63,7 +63,7 @@ __selfsigned_cert__ - генерация самоподписанных серт
 - генерирует сертификаты для etcd, kube-apiserver и др.
 
 # Требования
-Ansible 2.9+  
+Ansible 2.14+  
 Целевые серверы с ОС Debian (или совместимыми)  
 Доступ по SSH с правами sudo  
 Интернет-доступ для загрузки пакетов  
@@ -73,8 +73,8 @@ Ansible 2.9+
 
 git clone https://github.com/kyn07c0/ansible-k8s.git
 cd ansible-k8s
-Отредактируйте файл инвентаризации static.yaml, указав ваши серверы:
-```
+Отредактируйте файл инвентаризации stage.yaml или prod.yaml, указав ваши серверы:
+```yaml
 all:
   children:
     admin:
@@ -83,31 +83,35 @@ all:
           ansible_host: 192.168.88.30
     master:
       hosts:
-        k8s-master:
+        k8s-master1:
           ansible_host: 192.168.88.31
+        k8s-master2:
+          ansible_host: 192.168.88.32
+        k8s-master3:
+          ansible_host: 192.168.88.33
     worker:
       hosts:
         k8s-worker1:
-          ansible_host: 192.168.88.32
+          ansible_host: 192.168.88.34
           pod_subnet: 192.168.1.0/24
         k8s-worker2:
-          ansible_host: 192.168.88.33
+          ansible_host: 192.168.88.35
           pod_subnet: 192.168.2.0/24
 ```
 
 Настройте переменные в group_vars/all.yml под вашу инфраструктуру.
 
 Запустите playbook для развертывания control plane:
-```
-ansible-playbook -i inventory.ini site.yml --tags control_plane
+```bash
+ansible-playbook -i inventory/prod.yaml --tags control_plane
 ```
 Запустите playbook для развертывания worker nodes:
-```
-ansible-playbook -i inventory.ini site.yml --tags worker_nodes
+```bash
+ansible-playbook -i inventory/prod.yaml --tags worker_nodes
 ```
 Для развертывания всего кластера сразу:
-```
-ansible-playbook -i inventory.ini site.yml
+```bash
+ansible-playbook -i inventory/prod.yaml
 ```
 
 Дополнительные теги

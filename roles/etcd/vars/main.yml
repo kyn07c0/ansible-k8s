@@ -1,2 +1,4 @@
 ---
-# vars file for etcd
+
+etcd_ips: "{{ groups['master'] | map('extract', hostvars, 'ansible_host') | list }}"
+etcd_dns_names: "{{ groups['master'] | map('extract', hostvars, 'inventory_hostname') | list }}"

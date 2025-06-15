@@ -1,12 +1,5 @@
 ---
 
-- name: Install iptables
-  ansible.builtin.package:
-    name:
-      - iptables
-    state: present
-    update_cache: yes
-
 - name: Checking the installation of kubectl
   ansible.builtin.stat:
     path: "{{ kubectl_binary_dir }}/kubectl"
