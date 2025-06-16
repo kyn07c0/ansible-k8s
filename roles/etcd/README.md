@@ -23,31 +23,31 @@
 | etcd_local_binary_dir  | Расположение архива etcd для режима загрузки local.       | /home/yura/k8s/binary |
 | etcd_ips               | Список ip адресов кластера etcd (вычисляемое значение)    |                       |
 | etcd_dns_names         | Список доменных имён кластера etcd (вычисляемое значение) |                       |
-| etcd_protocol          | Протокол работы кластера etcd                             | "https"               |
+| etcd_protocol          | Протокол работы кластера etcd                             | https                 |
 | etcd_client_port       | Порт для клиентских запросов                              | 2379                  |
 | etcd_peer_port         | Порт для peer-запросов                                    | 2380                  |
-
 
 Зависимости
 ------------
 
 Эта роль не имеет прямых зависимостей от других Ansible ролей.
 
-Example Playbook
+Пример Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
+    - name: etcd
+      hosts:
+        - master
       roles:
-         - { role: username.rolename, x: 42 }
+        - etcd
+      tags: etcd
 
-License
+Лицензия
 -------
 
 BSD
 
-Author Information
+Информация об авторе
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+kyn
