@@ -10,15 +10,15 @@ ExecStart={{ etcd_binary_dir }}/etcd \
   --name=etcd_{{ inventory_hostname }} \
   --data-dir={{ etcd_data_dir }} \
   # Client settings
-  --listen-client-urls https://127.0.0.1:2379,https://{{ ansible_host }}:2379 \
-  --advertise-client-urls https://{{ ansible_host }}:2379 \
+  --listen-client-urls https://127.0.0.1:{{ etcd_client_port }},https://{{ ansible_host }}:{{ etcd_client_port }} \
+  --advertise-client-urls https://{{ ansible_host }}:{{ etcd_client_port }} \
   --client-cert-auth=true \
   --trusted-ca-file={{ cert_dir }}/ca.crt \
   --cert-file={{ cert_dir }}/etcd/server.crt \
   --key-file={{ cert_dir }}/etcd/server.key \
   # Peer settings (communication between etcd nodes)
-  --listen-peer-urls https://{{ ansible_host }}:2380 \
-  --initial-advertise-peer-urls https://{{ ansible_host }}:2380 \
+  --listen-peer-urls https://{{ ansible_host }}:{{ etcd_peer_port }} \
+  --initial-advertise-peer-urls https://{{ ansible_host }}:{{ etcd_peer_port }} \
   --peer-client-cert-auth=true \
   --peer-trusted-ca-file={{ cert_dir }}/ca.crt \
   --peer-cert-file={{ cert_dir }}/etcd/peer.crt \

@@ -33,7 +33,7 @@
   when: etcd_service_status.state != 'started'
 
 - name: Verify etcd cluster health
-  command: etcdctl --endpoints=https://127.0.0.1:2379 --cacert=/etc/kubernetes/pki/ca.crt --cert=/etc/kubernetes/pki/etcd/client.crt --key=/etc/kubernetes/pki/etcd/client.key endpoint health
+  command: etcdctl --endpoints=https://127.0.0.1:{{ etcd_client_port }} --cacert={{ cert_dir }}/ca.crt --cert={{ cert_dir }}/etcd/client.crt --key={{ cert_dir }}/etcd/client.key endpoint health
   register: etcd_health
   changed_when: false
   ignore_errors: yes
