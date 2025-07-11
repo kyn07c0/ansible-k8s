@@ -2,6 +2,7 @@
 
 - name: preset
   hosts:
+    - admin
     - master
     - worker
   roles:
@@ -27,8 +28,7 @@
   tags: kubectl
 
 - name: etcd
-  hosts:
-    - master
+  hosts: etcd
   roles:
     - etcd
   tags: etcd

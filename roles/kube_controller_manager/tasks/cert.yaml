@@ -2,15 +2,14 @@
 
 - name: Generate private key for component
   community.crypto.openssl_privatekey:
-    path: "{{ kube_controller_manager_cert_local_dir }}/{{kube_controller_manager_cert_key_file }}"
+    path: "{{ cert_dir }}/kube-controller-manager.key"
     size: "{{ key_size }}"
     type: "{{ key_type }}"
-  delegate_to: "localhost"
 
 - name: Generate a certificate signing request with subject information
   community.crypto.openssl_csr:
-    path: "{{ kube_controller_manager_cert_local_dir }}/kube-controller-manager.csr"
-    privatekey_path: "{{ kube_controller_manager_cert_local_dir }}/{{ kube_controller_manager_cert_key_file }}"
+    path: "{{ cert_dir }}/kube-controller-manager.csr"
+    privatekey_path: "{{ cert_dir }}/kube-controller-manager.key"
     basic_constraints: "CA:FALSE"
     extended_key_usage:
       - clientAuth
@@ -24,33 +23,14 @@
     country_name: "{{ country_name }}"
     state_or_province_name: "{{ state_or_province_name }}"
     locality_name: "{{ locality_name }}"
-    subject_alt_name: "DNS:kube-proxy,IP:127.0.0.1"
-    create_subject_key_identifier: yes
-  delegate_to: "localhost"
+#    subject_alt_name: "DNS:kube-proxy,IP:127.0.0.1"
+#    create_subject_key_identifier: yes
 
 - name: Generate a certificate
   community.crypto.x509_certificate:
-    path: "{{ kube_controller_manager_cert_local_dir }}/{{ kube_controller_manager_cert_file }}"
-    privatekey_path: "{{ kube_controller_manager_cert_local_dir }}/{{ kube_controller_manager_cert_key_file }}"
-    csr_path: "{{ kube_controller_manager_cert_local_dir }}/kube-controller-manager.csr"
-    ownca_path: "{{ kube_controller_manager_cert_local_dir }}/{{ ca_cert_file }}"
-    ownca_privatekey_path: "{{ kube_controller_manager_cert_local_dir }}/{{ ca_key_file }}"
+    path: "{{ cert_dir }}/kube-controller-manager.crt"
+    privatekey_path: "{{ cert_dir }}/kube-controller-manager.key"
+    csr_path: "{{ cert_dir }}/kube-controller-manager.csr"
+    ownca_path: "{{ cert_dir }}/ca.crt"
+    ownca_privatekey_path: "{{ cert_dir }}/ca.key"
     provider: ownca
-  delegate_to: "localhost"
-
-- name: Create remote cert directory
-  file:
-    path: "{{ kube_controller_manager_cert_dir }}"
-    state: directory
-
-- name: Copy certificates for kube-controller-manager
-  ansible.builtin.copy:
-    src: "{{ kube_controller_manager_cert_local_dir }}/{{ item }}"
-    dest: "{{ kube_controller_manager_cert_dir }}"
-  with_items:
-    - "{{ ca_key_file }}"
-    - "{{ ca_cert_file }}"
-    - "{{ kube_controller_manager_cert_key_file }}"
-    - "{{ kube_controller_manager_cert_file }}"
-    - "{{ service_account_cert_key_file }}"
-    - "{{ service_account_cert_file }}"

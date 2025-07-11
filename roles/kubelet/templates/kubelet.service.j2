@@ -7,7 +7,7 @@ Requires=containerd.service
 [Service]
 ExecStart={{ kubelet_binary_dir }}/kubelet \
   --config={{ kubelet_config_dir}}/kubelet-config.yaml \
-  --kubeconfig={{ kubelet_kubeconf_dir }}/kubelet.kubeconfig \
+  --kubeconfig={{ kubelet_kubeconfig_dir }}/kubelet.kubeconfig \
   --register-node=true \
   --v=2
 Restart=on-failure

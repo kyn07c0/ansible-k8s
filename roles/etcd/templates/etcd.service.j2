@@ -6,33 +6,26 @@ After=network.target
 [Service]
 Type=notify
 ExecStart={{ etcd_binary_dir }}/etcd \
-  # Identification
-  --name=etcd_{{ inventory_hostname }} \
+  --name={{ inventory_hostname }} \
   --data-dir={{ etcd_data_dir }} \
-  # Client settings
-  --listen-client-urls https://127.0.0.1:{{ etcd_client_port }},https://{{ ansible_host }}:{{ etcd_client_port }} \
-  --advertise-client-urls https://{{ ansible_host }}:{{ etcd_client_port }} \
+  --initial-cluster={{ etcd_cluster_list }} \
+  --initial-cluster-token=etcd-cluster \
+  --initial-cluster-state={% if is_initial_run %}new{% else %}existing{% endif %} \
   --client-cert-auth=true \
   --trusted-ca-file={{ cert_dir }}/ca.crt \
   --cert-file={{ cert_dir }}/etcd/server.crt \
   --key-file={{ cert_dir }}/etcd/server.key \
-  # Peer settings (communication between etcd nodes)
-  --listen-peer-urls https://{{ ansible_host }}:{{ etcd_peer_port }} \
-  --initial-advertise-peer-urls https://{{ ansible_host }}:{{ etcd_peer_port }} \
   --peer-client-cert-auth=true \
   --peer-trusted-ca-file={{ cert_dir }}/ca.crt \
   --peer-cert-file={{ cert_dir }}/etcd/peer.crt \
   --peer-key-file={{ cert_dir }}/etcd/peer.key \
-  # Cluster settings
-  --initial-cluster {{ etcd_cluster_list }} \
-  --initial-cluster-state={% if is_initial_run %}new{% else %}existing{% endif %} \
-  --initial-cluster-token etcd-cluster-1 \
-  # Performance tuning
-  --heartbeat-interval=250 \
-  --election-timeout=2000 \
+  --listen-client-urls=https://0.0.0.0:{{ etcd_client_port }} \
+  --advertise-client-urls=https://{{ ansible_host }}:{{ etcd_client_port }} \
+  --listen-peer-urls=https://0.0.0.0:{{ etcd_peer_port }} \
+  --initial-advertise-peer-urls=https://{{ ansible_host }}:{{ etcd_peer_port }} \
+  --heartbeat-interval=100 \
+  --election-timeout=1000 \
   --snapshot-count=10000 \
-  --max-snapshots=5 \
-  --max-wals=5 \
   --auto-compaction-retention=1
 
 Restart=on-failure

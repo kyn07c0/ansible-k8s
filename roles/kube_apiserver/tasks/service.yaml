@@ -5,14 +5,22 @@
     src: kube-apiserver.service.j2
     dest: /etc/systemd/system/kube-apiserver.service
     mode: 0644
-  notify:
-    - reload systemd
+  register: service_file_changed
 
-- name: Enable and start kube-apiserver
+- name: Enable kube-apiserver (only on creation)
   ansible.builtin.systemd:
     name: kube-apiserver
     state: started
     enabled: yes
+  when: ansible_service_facts.ansible_facts.services is not defined or ansible_service_facts.ansible_facts.services[service_name] is not defined
+
+- name: Reload systemd daemon and restart service
+  ansible.builtin.systemd:
+    name: kube-apiserver
+    daemon_reload: yes
+    state: restarted
+  when: service_file_changed.changed
+  notify: reload systemd
 
 - name: Check started service
   ansible.builtin.service:

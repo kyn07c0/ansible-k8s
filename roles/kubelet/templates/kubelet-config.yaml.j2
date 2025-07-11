@@ -1,24 +1,26 @@
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
+address: 0.0.0.0  # Слушать на всех интерфейсах
+port: 10250  # Порт Kublet
 authentication:
   anonymous:
-    enabled: false
+    enabled: false  # Отключить анонимный доступ
   webhook:
-    enabled: true
+    enabled: true  # Включить webhook-аутентификацию
   x509:
-    clientCAFile: "{{ kubelet_cert_dir }}/{{ ca_cert_file }}"
+    clientCAFile: "{{ cert_dir }}/ca.crt"  # CA для проверки клиентов
 authorization:
-  mode: Webhook
-clusterDomain: "cluster.local"
+  mode: Webhook  # Использовать webhook для авторизации
+clusterDomain: "cluster.local"  # Домен кластера
 clusterDNS:
-  - "10.32.0.10"
+  - "10.32.0.10"  # IP CoreDNS
 cgroupDriver: systemd
 containerRuntimeEndpoint: "unix:///var/run/containerd/containerd.sock"
 podCIDR: "{{ hostvars[inventory_hostname]['pod_subnet'] }}"
 resolvConf: "{{ resolv_conf }}"
 runtimeRequestTimeout: "15m"
-tlsCertFile: "{{ kubelet_cert_dir }}/{{ kubelet_cert_file }}"
-tlsPrivateKeyFile: "{{ kubelet_cert_dir }}/{{ kubelet_cert_key_file }}"
+tlsCertFile: "{{ cert_dir }}/kubelet.crt"
+tlsPrivateKeyFile: "{{ cert_dir }}/kubelet.key"
 noProxy:
   - "localhost"
   - "127.0.0.1"

@@ -2,21 +2,19 @@
 
 - name: Create cert directory
   file:
-    path: "{{ kube_proxy_cert_local_dir }}"
+    path: "{{ cert_dir }}"
     state: directory
-  delegate_to: "localhost"
 
 - name: Generate private key for component
   community.crypto.openssl_privatekey:
-    path: "{{ kube_proxy_cert_local_dir }}/{{ kube_proxy_cert_key_file }}"
+    path: "{{ cert_dir }}/kube-proxy.key"
     size: "{{ key_size }}"
     type: "{{ key_type }}"
-  delegate_to: "localhost"
 
 - name: Generate a certificate signing request with subject information
   community.crypto.openssl_csr:
-    path: "{{ kube_proxy_cert_local_dir }}/kube-proxy.csr"
-    privatekey_path: "{{ kube_proxy_cert_local_dir }}/{{ kube_proxy_cert_key_file }}"
+    path: "{{ cert_dir }}/kube-proxy.csr"
+    privatekey_path: "{{ cert_dir }}/kube-proxy.key"
     basic_constraints: "CA:FALSE"
     extended_key_usage:
       - clientAuth
@@ -32,27 +30,13 @@
     locality_name: "{{ locality_name }}"
     subject_alt_name: "DNS:kube-proxy,IP:127.0.0.1"
     create_subject_key_identifier: yes
-  delegate_to: "localhost"
 
 - name: Generate a certificate
   community.crypto.x509_certificate:
-    path: "{{ kube_proxy_cert_local_dir }}/{{ kube_proxy_cert_file }}"
-    privatekey_path: "{{ kube_proxy_cert_local_dir }}/{{ kube_proxy_cert_key_file }}"
-    csr_path: "{{ kube_proxy_cert_local_dir }}/kube-proxy.csr"
-    ownca_path: "{{ kube_proxy_cert_local_dir }}/{{ ca_cert_file }}"
-    ownca_privatekey_path: "{{ kube_proxy_cert_local_dir }}/{{ ca_key_file }}"
+    path: "{{ cert_dir }}/kube-proxy.crt"
+    privatekey_path: "{{ cert_dir }}/kube-proxy.key"
+    csr_path: "{{ cert_dir }}/kube-proxy.csr"
+    ownca_path: "{{ cert_dir }}/ca.crt"
+    ownca_privatekey_path: "{{ cert_dir }}/ca.key"
     provider: ownca
-  delegate_to: "localhost"
 
-- name: Create remote cert directory
-  file:
-    path: "{{ kube_proxy_cert_dir }}"
-    state: directory
-
-- name: Copy private key and certificate to remote servers
-  copy:
-    src: "{{ kube_proxy_cert_local_dir }}/{{ item }}"
-    dest: "{{ kube_proxy_cert_dir }}/{{ item }}"
-  loop:
-    - "{{ kube_proxy_cert_file }}"
-    - "{{ kube_proxy_cert_key_file }}"

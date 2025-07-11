@@ -2,7 +2,36 @@
 
 kind: KubeProxyConfiguration
 apiVersion: kubeproxy.config.k8s.io/v1alpha1
+
+# Режим работы
+mode: "iptables"  # или "ipvs" для больших кластеров
+
+# Настройки подключения к API-серверам
 clientConnection:
-  kubeconfig: "{{ kube_proxy_kubeconf_dir }}/kube-proxy.kubeconfig"
-mode: "iptables"
-clusterCIDR: "10.200.0.0/16"
+  kubeconfig: "{{ kube_proxy_kubeconfig_dir }}/kube-proxy.kubeconfig"  # Файл с настройками подключения
+  burst: 20                                                          # Макс. количество запросов
+  qps: 10                                                            # Запросов в секунду
+
+# Настройки IPVS (если mode=ipvs)
+ipvs:
+  scheduler: "rr"                                                    # round-robin
+  minSyncPeriod: "5s"                                                # Минимальный интервал синхронизации
+  syncPeriod: "30s"                                                  # Интервал синхронизации
+  excludeCIDRs: []                                                   # Исключаемые CIDR
+
+# Настройки iptables
+iptables:
+  masqueradeAll: false                                               # SNAT для всех трафиков
+  syncPeriod: "30s"                                                  # Интервал синхронизации правил
+  minSyncPeriod: "5s"                                                # Минимальный интервал
+
+# Настройки для HA кластера
+clusterCIDR: "10.200.0.0/16"                                         # CIDR подов
+conntrack:
+  maxPerCore: 32768                                                  # Макс. соединений на ядро
+  tcpCloseWaitTimeout: "1h"                                          # Таймаут TCP close_wait
+  tcpEstablishedTimeout: "24h"                                       # Таймаут установленных соединений
+
+# Healthz-порт
+healthzBindAddress: "0.0.0.0:10256"                                  # Адрес для health checks
+metricsBindAddress: "0.0.0.0:10249"                                  # Адрес для метрик

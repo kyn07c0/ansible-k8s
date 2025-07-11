@@ -1,15 +1,5 @@
 ---
 
-- name: Create kube-scheduler config directory
-  ansible.builtin.file:
-    path: "{{ kube_scheduler_config_dir }}"
-    state: directory
-
-- name: Copy file kube-scheduler config
-  ansible.builtin.template:
-    src: kube_scheduler_config.yaml.j2
-    dest: "{{ kube_scheduler_config_dir }}/kube-scheduler-config.yaml"
-
 - name: Is kube-scheduler installed
   ansible.builtin.stat:
     path: "{{ kube_scheduler_extract_dir }}/kube-scheduler-{{ kube_scheduler_version }}/kube-scheduler"

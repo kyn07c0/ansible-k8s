@@ -1,7 +1,7 @@
 ---
 
-etcd_ips: "{{ groups['master'] | map('extract', hostvars, 'ansible_host') | list }}"
-etcd_dns_names: "{{ groups['master'] | map('extract', hostvars, 'inventory_hostname') | list }}"
+etcd_ips: "{{ groups['etcd'] | map('extract', hostvars, 'ansible_host') | list }}"
+etcd_dns_names: "{{ groups['etcd'] | map('extract', hostvars, 'inventory_hostname') | list }}"
 
 etcd_protocol: "https"
 etcd_client_port: 2379

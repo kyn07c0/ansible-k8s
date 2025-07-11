@@ -2,12 +2,12 @@
 
 - name: Check for existence of CA file
   stat:
-    path: "{{ cert_dir }}/{{ ca_cert_file }}"
+    path: "{{ cert_dir }}/ca.crt"
   register: ca_file_status
 
 - name: Stop playbook if file does not exist
   fail:
-    msg: "file {{ cert_dir }}/{{ ca_cert_file }} does not exist. Playbook stopped."
+    msg: "file {{ cert_dir }}/ca.crt does not exist. Playbook stopped."
   when: not ca_file_status.stat.exists
 
 - name: Create directory for etcd certificates
@@ -64,8 +64,8 @@
     path: "{{ cert_dir }}/etcd/server.crt"
     privatekey_path: "{{ cert_dir }}/etcd/server.key"
     csr_path: "{{ cert_dir }}/etcd/server.csr"
-    ownca_path: "{{ cert_dir }}/{{ ca_cert_file }}"
-    ownca_privatekey_path: "{{ cert_dir }}/{{ ca_key_file }}"
+    ownca_path: "{{ cert_dir }}/ca.crt"
+    ownca_privatekey_path: "{{ cert_dir }}/ca.key"
     provider: ownca
     ownca_not_after: "+{{ cert_expiry_days }}d"
   when: etcd_csr is changed
@@ -119,8 +119,8 @@
     path: "{{ cert_dir }}/etcd/peer.crt"
     privatekey_path: "{{ cert_dir }}/etcd/peer.key"
     csr_path: "{{ cert_dir }}/etcd/peer.csr"
-    ownca_path: "{{ cert_dir }}/{{ ca_cert_file }}"
-    ownca_privatekey_path: "{{ cert_dir }}/{{ ca_key_file }}"
+    ownca_path: "{{ cert_dir }}/ca.crt"
+    ownca_privatekey_path: "{{ cert_dir }}/ca.key"
     provider: ownca
     ownca_not_after: "+{{ cert_expiry_days }}d"
   when: etcd_peer_csr is changed
@@ -174,8 +174,8 @@
     path: "{{ cert_dir }}/etcd/client.crt"
     privatekey_path: "{{ cert_dir }}/etcd/client.key"
     csr_path: "{{ cert_dir }}/etcd/client.csr"
-    ownca_path: "{{ cert_dir }}/{{ ca_cert_file }}"
-    ownca_privatekey_path: "{{ cert_dir }}/{{ ca_key_file }}"
+    ownca_path: "{{ cert_dir }}/ca.crt"
+    ownca_privatekey_path: "{{ cert_dir }}/ca.key"
     provider: ownca
     ownca_not_after: "+{{ cert_expiry_days }}d"
   when: etcd_client_csr is changed
