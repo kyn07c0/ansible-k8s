@@ -10,9 +10,3 @@ kube_apiserver_install_mode: network
 kube_apiserver_local_binary_dir: /home/yura/k8s/binary
 
 kube_apiserver_kubeconf_dir: /root/.kube
-
-key_size: 4096
-key_type: RSA
-country_name: RU
-state_or_province_name: RUSSIA
-locality_name: Saint-Petersburg

@@ -10,9 +10,3 @@ kube_scheduler_install_mode: network
 kube_scheduler_local_binary_dir: /home/yura/k8s/binary
 
 kube_scheduler_kubeconfig_dir: /etc/kubernetes
-
-#key_size: 4096
-#key_type: RSA
-#country_name: RU
-#state_or_province_name: RUSSIA
-#locality_name: Saint-Petersburg

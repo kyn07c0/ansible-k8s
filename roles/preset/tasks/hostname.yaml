@@ -2,20 +2,28 @@
 
 - name: Set hostname
   ansible.builtin.hostname:
-    name: "{{ inventory_hostname }}"
+    name: "{{ host_name }}"
 
 - name: Fix /etc/hosts removing the old hostname
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/hosts
     regexp: "^127.0.1.1"
-    line: "127.0.1.1\t{{ inventory_hostname }} {{ inventory_hostname }}.{{ domain_name }}"
+    line: "127.0.1.1\t{{ host_name }} {{ fqdn }}"
     state: present
 
+- name: Remove existing host string
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: "^{{ hostvars[item].ansible_host }}.*$"
+    state: absent
+  when: hostvars[item].ansible_host is defined
+  with_items: "{{ groups.all }}"
+
 - name: Build hosts file
-  lineinfile:
-    dest: /etc/hosts
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
     regexp: "^{{ hostvars[item].ansible_host }}$"
-    line: "{{ hostvars[item].ansible_host }}\t{{ hostvars[item].inventory_hostname }} {{ item }}.{{ domain_name }}"
+    line: "{{ hostvars[item].ansible_host }}\t{{ hostvars[item].inventory_hostname }} {{ item }}.{{ cluster_name }}.{{ domain_name }}"
     state: present
   when: hostvars[item].ansible_host is defined
   with_items: "{{ groups.all }}"

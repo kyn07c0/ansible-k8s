@@ -1,2 +1,3 @@
 ---
-# vars file for selfsigned_cert
+
+ca_request_file: ca.csr

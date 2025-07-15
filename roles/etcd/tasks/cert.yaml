@@ -46,7 +46,7 @@
     state_or_province_name: "{{ state_or_province_name }}"
     locality_name: "{{ locality_name }}"
     subject_alt_name: >-
-      [ 
+      [
         "IP:127.0.0.1",
         "DNS:localhost"
         {% for ip in etcd_ips %},
