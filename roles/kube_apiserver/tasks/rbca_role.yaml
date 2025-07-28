@@ -3,7 +3,7 @@
 - name: Ganerate config admin (set cluster)
   ansible.builtin.command: >
     kubectl config set-cluster k8s
-    --certificate-authority={{ cert_dir }}/ca.crt
+    --certificate-authority={{ cert_dir }}/{{ ca_cert_file }}
     --embed-certs=true
     --server=https://127.0.0.1:6443
     --kubeconfig={{ kube_apiserver_kubeconf_dir }}/admin.kubeconfig

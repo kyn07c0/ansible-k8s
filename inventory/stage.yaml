@@ -4,6 +4,12 @@ all:
       hosts:
         admin:
           ansible_host: 192.168.88.40
+    lb:
+      hosts:
+        lb1:
+          ansible_host: 192.168.88.51
+        lb2:
+          ansible_host: 192.168.88.52
     master:
       hosts:
         master1:

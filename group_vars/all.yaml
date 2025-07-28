@@ -4,6 +4,7 @@ host_name: "{{ inventory_hostname }}"
 cluster_name: k8s
 domain_name:  local
 fqdn: "{{ host_name }}.{{ cluster_name }}.{{ domain_name }}"
+vip: 192.168.88.200
 
 cert_dir: /etc/kubernetes/pki
 ca_key_file: ca.key

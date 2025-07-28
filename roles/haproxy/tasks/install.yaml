@@ -1,0 +1,75 @@
+---
+
+- name: Create HAProxy configuration directory
+  ansible.builtin.file:
+    path: "{{ haproxy_config_dir }}"
+    state: directory
+
+- name: Copy file configuration HAProxy
+  ansible.builtin.template:
+    src: haproxy.cfg.j2
+    dest: "{{ haproxy_config_dir }}/haproxy.cfg"
+    mode: '0640'
+
+- name: Install packages
+  ansible.builtin.package:
+    name:
+      - build-essential
+      - libssl-dev
+      - libpcre3-dev
+      - zlib1g-dev
+    state: present
+    update_cache: yes
+
+- name: Checking the installation of HAProxy
+  ansible.builtin.stat:
+    path: "{{ haproxy_binary_dir }}/haproxy"
+  register: haproxy_file_found
+
+- block:
+
+  - name: Create haproxy group
+    ansible.builtin.group:
+      name: haproxy
+      system: yes
+      state: present
+
+  - name: Create haproxy user
+    ansible.builtin.user:
+      name: haproxy
+      group: haproxy
+      system: yes
+      shell: /usr/sbin/nologin
+      home: /var/lib/haproxy
+      create_home: yes
+
+  - name: Download HAProxy from network
+    ansible.builtin.get_url:
+      url: "https://www.haproxy.org/download/3.2/src/haproxy-{{ haproxy_version }}.tar.gz"
+      dest: "/tmp/haproxy-{{ haproxy_version }}.tar.gz"
+    when:
+      - haproxy_install_mode == 'network'
+
+  - name: Download HAProxy from local dir
+    ansible.builtin.copy:
+      src: "{{ haproxy_local_archive_dir }}/haproxy-{{ haproxy_version }}/"
+      dest: "/tmp/haproxy-{{ haproxy_version }}.tar.gz"
+    when:
+      - haproxy_install_mode == 'local'
+
+  - name: Extract HAProxy source
+    ansible.builtin.unarchive:
+      src: "/tmp/haproxy-{{ haproxy_version }}.tar.gz"
+      dest: "/tmp"
+      remote_src: yes
+
+  - name: Compile and install HAProxy
+    ansible.builtin.command: "{{ item }}"
+    args:
+      chdir: "/tmp/haproxy-{{ haproxy_version }}"
+    loop:
+      - make TARGET=linux-glibc USE_OPENSSL=1 USE_ZLIB=1 USE_PCRE=1
+      - make install
+
+  when:
+    - not haproxy_file_found.stat.exists

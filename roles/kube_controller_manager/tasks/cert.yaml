@@ -23,14 +23,12 @@
     country_name: "{{ country_name }}"
     state_or_province_name: "{{ state_or_province_name }}"
     locality_name: "{{ locality_name }}"
-#    subject_alt_name: "DNS:kube-proxy,IP:127.0.0.1"
-#    create_subject_key_identifier: yes
 
 - name: Generate a certificate
   community.crypto.x509_certificate:
     path: "{{ cert_dir }}/kube-controller-manager.crt"
     privatekey_path: "{{ cert_dir }}/kube-controller-manager.key"
     csr_path: "{{ cert_dir }}/kube-controller-manager.csr"
-    ownca_path: "{{ cert_dir }}/ca.crt"
-    ownca_privatekey_path: "{{ cert_dir }}/ca.key"
+    ownca_path: "{{ cert_dir }}/{{ ca_cert_file }}"
+    ownca_privatekey_path: "{{ cert_dir }}/{{ ca_key_file }}"
     provider: ownca

@@ -51,6 +51,7 @@
       [
         "IP:127.0.0.1",
         "IP:10.32.0.1",
+        "IP:{{ vip }}",
         {{ ip_addresses }},
         "DNS:kubernetes",
         "DNS:kubernetes.default",
@@ -107,8 +108,8 @@
     path: "{{ cert_dir }}/service-account.crt"
     privatekey_path: "{{ cert_dir }}/service-account.key"
     csr_path: "{{ cert_dir }}/service-account.csr"
-    ownca_path: "{{ cert_dir }}/ca.crt"
-    ownca_privatekey_path: "{{ cert_dir }}/ca.key"
+    ownca_path: "{{ cert_dir }}/{{ ca_cert_file }}"
+    ownca_privatekey_path: "{{ cert_dir }}/{{ ca_key_file }}"
     provider: ownca
 
 #################################################
@@ -146,6 +147,6 @@
     path: "{{ cert_dir }}/proxy-client.crt"
     privatekey_path: "{{ cert_dir }}/proxy-client.key"
     csr_path: "{{ cert_dir }}/proxy-client.csr"
-    ownca_path: "{{ cert_dir }}/ca.crt"
-    ownca_privatekey_path: "{{ cert_dir }}/ca.key"
+    ownca_path: "{{ cert_dir }}/{{ ca_cert_file }}"
+    ownca_privatekey_path: "{{ cert_dir }}/{{ ca_key_file }}"
     provider: ownca

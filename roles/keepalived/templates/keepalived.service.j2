@@ -1,0 +1,15 @@
+[Unit]
+Description=Keepalive Daemon (LVS and VRRP)
+After=network.target
+Documentation=man:keepalived(8)
+
+[Service]
+Type=forking
+PIDFile=/run/keepalived.pid
+ExecStart={{ keepalived_binary_dir }}/keepalived --dont-fork --log-console 
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

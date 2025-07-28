@@ -31,6 +31,6 @@
     path: "{{ cert_dir }}/kube-scheduler.crt"
     privatekey_path: "{{ cert_dir }}/kube-scheduler.key"
     csr_path: "{{ cert_dir }}/kube-scheduler.csr"
-    ownca_path: "{{ cert_dir }}/ca.crt"
-    ownca_privatekey_path: "{{ cert_dir }}/ca.key"
+    ownca_path: "{{ cert_dir }}/{{ ca_cert_file }}"
+    ownca_privatekey_path: "{{ cert_dir }}/{{ ca_key_file }}"
     provider: ownca

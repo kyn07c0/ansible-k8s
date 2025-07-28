@@ -8,7 +8,7 @@ authentication:
   webhook:
     enabled: true  # Включить webhook-аутентификацию
   x509:
-    clientCAFile: "{{ cert_dir }}/ca.crt"  # CA для проверки клиентов
+    clientCAFile: "{{ cert_dir }}/{{ ca_cert_file }}"  # CA для проверки клиентов
 authorization:
   mode: Webhook  # Использовать webhook для авторизации
 clusterDomain: "cluster.local"  # Домен кластера

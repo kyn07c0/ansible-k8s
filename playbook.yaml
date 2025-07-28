@@ -3,6 +3,7 @@
 - name: preset
   hosts:
     - admin
+    - lb
     - master
     - worker
   roles:
@@ -32,6 +33,21 @@
   roles:
     - etcd
   tags: etcd
+
+- name: haproxy
+  hosts:
+    - lb
+  roles:
+    - haproxy
+  tags: haproxy
+
+- name: keepalived
+  hosts:
+    - lb
+  gather_facts: true
+  roles:
+    - keepalived
+  tags: keepalived
 
 - name: kube_apiserver
   hosts:

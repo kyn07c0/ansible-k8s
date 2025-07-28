@@ -1,0 +1,8 @@
+---
+
+haproxy_version: 3.2.3
+haproxy_binary_dir: /usr/local/sbin
+haproxy_config_dir: /etc/haproxy
+
+haproxy_install_mode: network
+

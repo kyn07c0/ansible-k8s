@@ -31,6 +31,6 @@
     path: "{{ cert_dir }}/kubelet.crt"
     privatekey_path: "{{ cert_dir }}/kubelet.key"
     csr_path: "{{ cert_dir }}/kubelet.csr"
-    ownca_path: "{{ cert_dir }}/ca.crt"
-    ownca_privatekey_path: "{{ cert_dir }}/ca.key"
+    ownca_path: "{{ cert_dir }}/{{ ca_cert_file }}"
+    ownca_privatekey_path: "{{ cert_dir }}/{{ ca_key_file }}"
     provider: ownca

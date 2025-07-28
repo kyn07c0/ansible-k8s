@@ -1,0 +1,11 @@
+---
+
+keepalived_version: 2.3.4
+keepalived_binary_dir: /usr/sbin
+keepalived_config_dir: /usr/etc/keepalived
+
+keepalived_install_mode: network
+
+virtual_ip: 192.168.88.200
+keepalived_auth_pass: "qwerty"
+haproxy_check_script: "/usr/libexec/keepalived/haproxy_check.sh"
