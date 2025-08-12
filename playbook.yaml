@@ -44,7 +44,7 @@
 - name: keepalived
   hosts:
     - lb
-  gather_facts: true
+#  gather_facts: true
   roles:
     - keepalived
   tags: keepalived
@@ -79,6 +79,7 @@
 
 - name: cni
   hosts:
+    - master
     - worker
   roles:
     - cni

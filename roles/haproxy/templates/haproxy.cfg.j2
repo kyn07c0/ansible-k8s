@@ -1,6 +1,7 @@
 global
     pidfile /var/run/haproxy.pid
-    log /dev/log local0
+    log stdout format raw local0 info
+    maxconn 50000
     chroot /var/lib/haproxy
     user haproxy
     group haproxy
@@ -8,12 +9,12 @@ global
 
 defaults
     log global
-    mode http
-    option httplog
+    mode tcp
+    option tcplog
     option dontlognull
-    timeout connect 5000
-    timeout client 50000
-    timeout server 50000
+    timeout connect 5s
+    timeout client 50s
+    timeout server 50s
 
 frontend kubernetes_api_frontend
     bind *:6443
@@ -22,6 +23,7 @@ frontend kubernetes_api_frontend
 
 backend kubernetes_api_backend
     mode tcp
+    option tcp-check
     balance roundrobin
 {% for host in groups['master'] %}
     server {{ host }} {{ hostvars[host]['ansible_host'] }}:6443 check

@@ -14,7 +14,7 @@
   ansible.builtin.template:
     src: keepalived.conf.j2
     dest: "{{ keepalived_config_dir }}/keepalived.conf"
-    mode: '0640'
+    mode: '0644'
   when: interface_name is defined
 
 - name: Install packages
@@ -23,6 +23,7 @@
       - build-essential
       - libssl-dev
       - libnl-3-dev
+      - libnl-genl-3-dev
       - libnl-route-3-dev
       - libnfnetlink-dev
     state: present

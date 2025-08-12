@@ -1,12 +1,13 @@
 [Unit]
 Description=HAProxy Load Balancer
-After=network.target
+After=network-online.target
 
 [Service]
 ExecStart={{ haproxy_binary_dir }}/haproxy -f {{ haproxy_config_dir }}/haproxy.cfg
 ExecReload=/bin/kill -HUP $MAINPID
-KillMode=process
+KillMode=mixed
 Restart=on-failure
+TimeoutStopSec=30s
 
 [Install]
 WantedBy=multi-user.target
