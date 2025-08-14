@@ -1,6 +1,6 @@
 ---
 
-kubectl_version: 1.30.0
+kubectl_version: 1.33.0
 kubectl_binary_dir: /usr/local/bin
 
 kubectl_install_mode: network

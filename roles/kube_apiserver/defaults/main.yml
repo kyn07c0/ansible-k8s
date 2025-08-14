@@ -1,6 +1,6 @@
 ---
 
-kube_apiserver_version: 1.30.0
+kube_apiserver_version: 1.33.0
 
 kube_apiserver_extract_dir: /opt
 kube_apiserver_binary_dir: /usr/local/bin

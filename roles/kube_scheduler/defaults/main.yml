@@ -1,6 +1,6 @@
 ---
 
-kube_scheduler_version: 1.30.0
+kube_scheduler_version: 1.33.0
 
 kube_scheduler_extract_dir: /opt
 kube_scheduler_binary_dir: /usr/local/bin

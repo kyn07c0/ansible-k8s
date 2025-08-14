@@ -22,13 +22,17 @@
   when: service_file_changed.changed
   notify: reload systemd
 
-- name: Check started service
-  ansible.builtin.service:
-    name: kube-apiserver
-    state: started
-  register: kube_apiserver_service_status
+- name: wait kube-apiserver to be ready
+  ansible.builtin.uri:
+    url: "https://localhost:6443/healthz"
+    validate_certs: false
+    status_code: 200
+  until: apiserver_healthz.status == 200
+  retries: 10
+  delay: 10
+  register: apiserver_healthz
 
 - name: Terminate playbook if service is not running
   ansible.builtin.fail:
     msg: "The kube-apiserver service is not running. Playbook has stoped."
-  when: kube_apiserver_service_status.state != 'started'
+  when: apiserver_healthz.status != 200

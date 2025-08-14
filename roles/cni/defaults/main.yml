@@ -1,6 +1,6 @@
 ---
 
-cni_version: 1.4.1
+cni_version: 1.7.1
 
 cni_extract_dir: /opt
 cni_binary_dir: /opt/cni/bin

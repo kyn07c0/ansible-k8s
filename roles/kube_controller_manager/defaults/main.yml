@@ -1,6 +1,6 @@
 ---
 
-kube_controller_manager_version: 1.30.0
+kube_controller_manager_version: 1.33.0
 
 kube_controller_manager_extract_dir: /opt
 kube_controller_manager_binary_dir: /usr/local/bin

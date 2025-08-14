@@ -6,3 +6,5 @@ haproxy_config_dir: /etc/haproxy
 
 haproxy_install_mode: network
 
+haproxy_stats_user: admin
+haproxy_stats_password: qwerty

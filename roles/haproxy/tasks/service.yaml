@@ -13,13 +13,18 @@
     state: started
     enabled: yes
 
-- name: Check started service
-  ansible.builtin.service:
-    name: haproxy
-    state: started
-  register: haproxy_service_status
+- name: wait haproxy to be ready
+  ansible.builtin.uri:
+    url: "http://localhost:8080/haproxy?stats"
+    url_username: "{{ haproxy_stats_user }}"
+    url_password: "{{ haproxy_stats_password }}"
+    status_code: 200
+  until: haproxy_stats.status == 200
+  retries: 10
+  delay: 10
+  register: haproxy_stats
 
 - name: Terminate playbook if service is not running
   ansible.builtin.fail:
-    msg: "The HAProxy service is not running. Playbook has stoped."
-  when: haproxy_service_status.state != 'started'
+    msg: "The haproxy service is not running. Playbook has stoped."
+  when: haproxy_stats.status != 200
