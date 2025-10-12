@@ -23,37 +23,37 @@
 
 - block:
 
-  - name: Create kubelet directory
-    ansible.builtin.file:
-      path: "{{ kubelet_extract_dir }}/kubelet-{{ kubelet_version }}"
-      state: directory
+    - name: Create kubelet directory
+      ansible.builtin.file:
+        path: "{{ kubelet_extract_dir }}/kubelet-{{ kubelet_version }}"
+        state: directory
 
-  - shell: uname -s
-    register: os
+    - shell: uname -s
+      register: os
 
-  - shell: dpkg --print-architecture
-    register: architecture
+    - shell: dpkg --print-architecture
+      register: architecture
 
-  - name: Download kubelet from network
-    ansible.builtin.get_url:
-      url: "https://dl.k8s.io/v{{ kubelet_version }}/bin/{{ os.stdout | lower }}/{{ architecture.stdout }}/kubelet"
-      dest: "{{ kubelet_extract_dir }}/kubelet-{{ kubelet_version }}"
-    when:
-      - kubelet_install_mode == 'network'
+    - name: Download kubelet from network
+      ansible.builtin.get_url:
+        url: "https://dl.k8s.io/v{{ kubelet_version }}/bin/{{ os.stdout | lower }}/{{ architecture.stdout }}/kubelet"
+        dest: "{{ kubelet_extract_dir }}/kubelet-{{ kubelet_version }}"
+      when:
+        - kubelet_install_mode == 'network'
 
-  - name: Download kubelet from local dir
-    ansible.builtin.copy:
-      src: "{{ kubelet_local_binary_dir }}/kubelet"
-      dest: "{{ kubelet_extract_dir }}/kubelet-{{ kubelet_version }}"
-    when:
-      - kubelet_install_mode == 'local'
+    - name: Download kubelet from local dir
+      ansible.builtin.copy:
+        src: "{{ kubelet_local_binary_dir }}/kubelet"
+        dest: "{{ kubelet_extract_dir }}/kubelet-{{ kubelet_version }}"
+      when:
+        - kubelet_install_mode == 'local'
 
-  - name: Create symlinks to /usr/local/bin
-    ansible.builtin.file:
-      src: "{{ kubelet_extract_dir }}/kubelet-{{ kubelet_version }}/kubelet"
-      path: "{{ kubelet_binary_dir }}/kubelet"
-      state: link
-      mode: u+x
+    - name: Create symlinks to /usr/local/bin
+      ansible.builtin.file:
+        src: "{{ kubelet_extract_dir }}/kubelet-{{ kubelet_version }}/kubelet"
+        path: "{{ kubelet_binary_dir }}/kubelet"
+        state: link
+        mode: u+x
 
   when:
     - not kubelet_file_found.stat.exists

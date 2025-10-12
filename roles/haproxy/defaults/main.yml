@@ -1,10 +1,11 @@
 ---
 
-haproxy_version: 3.2.3
+haproxy_version: 3.2.5
 haproxy_binary_dir: /usr/local/sbin
 haproxy_config_dir: /etc/haproxy
 
-haproxy_install_mode: network
+haproxy_install_mode: local
+haproxy_local_binary_dir: /home/yura/k8s/binary
 
 haproxy_stats_user: admin
 haproxy_stats_password: qwerty

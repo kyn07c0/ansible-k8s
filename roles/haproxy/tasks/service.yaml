@@ -11,7 +11,7 @@
   ansible.builtin.systemd:
     name: haproxy
     state: started
-    enabled: yes
+    enabled: true
 
 - name: wait haproxy to be ready
   ansible.builtin.uri:

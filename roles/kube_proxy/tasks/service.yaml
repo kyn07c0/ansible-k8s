@@ -11,7 +11,7 @@
   ansible.builtin.systemd:
     name: kube-proxy
     state: started
-    enabled: yes
+    enabled: true
 
 - name: Check started service
   ansible.builtin.service:

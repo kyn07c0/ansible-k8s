@@ -1,15 +1,38 @@
 ---
 
+- name: Check for existence of CA file
+  stat:
+    path: "{{ cert_local_dir }}/{{ ca_cert_file }}"
+  register: ca_file_status
+  delegate_to: localhost
+  run_once: true
+  become: false
+
+- name: Stop playbook if file does not exist
+  fail:
+    msg: "file {{ cert_local_dir }}/{{ ca_cert_file }} does not exist. Playbook stopped."
+  when: not ca_file_status.stat.exists
+  delegate_to: localhost
+  run_once: true
+  become: false
+
+################################################################################
+# Create a kubelet certificate
+################################################################################
+
 - name: Generate private key for workers nodes.
   community.crypto.openssl_privatekey:
-    path: "{{ cert_dir }}/kubelet.key"
+    path: "{{ cert_local_dir }}/{{ kubelet_key_file }}"
     size: "{{ key_size }}"
     type: "{{ key_type }}"
+  delegate_to: localhost
+  run_once: true
+  become: false
 
 - name: Generate a certificate signing request with subject information
   community.crypto.openssl_csr:
-    path: "{{ cert_dir }}/kubelet.csr"
-    privatekey_path: "{{ cert_dir }}/kubelet.key"
+    path: "{{ cert_local_dir }}/{{ kubelet_csr_file }}"
+    privatekey_path: "{{ cert_local_dir }}/{{ kubelet_key_file }}"
     basic_constraints: "CA:FALSE"
     extended_key_usage:
       - clientAuth
@@ -24,13 +47,48 @@
     state_or_province_name: "{{ state_or_province_name }}"
     locality_name: "{{ locality_name }}"
     subject_alt_name: "DNS:{{ inventory_hostname }},IP:127.0.0.1,IP:{{ ansible_host }}"
-    create_subject_key_identifier: yes
+    create_subject_key_identifier: true
+  delegate_to: localhost
+  run_once: true
+  become: false
 
 - name: Generate a certificate
   community.crypto.x509_certificate:
-    path: "{{ cert_dir }}/kubelet.crt"
-    privatekey_path: "{{ cert_dir }}/kubelet.key"
-    csr_path: "{{ cert_dir }}/kubelet.csr"
-    ownca_path: "{{ cert_dir }}/{{ ca_cert_file }}"
-    ownca_privatekey_path: "{{ cert_dir }}/{{ ca_key_file }}"
+    path: "{{ cert_local_dir }}/{{ kubelet_cert_file }}"
+    privatekey_path: "{{ cert_local_dir }}/{{ kubelet_key_file }}"
+    csr_path: "{{ cert_local_dir }}/{{ kubelet_csr_file }}"
+    ownca_path: "{{ cert_local_dir }}/{{ ca_cert_file }}"
+    ownca_privatekey_path: "{{ cert_local_dir }}/{{ ca_key_file }}"
     provider: ownca
+  delegate_to: localhost
+  run_once: true
+  become: false
+
+################################################################################
+# Copy CA to remote servers
+################################################################################
+
+- name: copy CA to remote servers
+  ansible.builtin.copy:
+    src: "{{ cert_local_dir }}/{{ item }}"
+    dest: "{{ cert_dir }}/{{ item }}"
+  loop:
+    - "{{ ca_key_file }}"
+    - "{{ ca_cert_file }}"
+
+################################################################################
+# Copy kubelet certificate to remote servers
+################################################################################
+
+- name: Create directory for kubelet certificate
+  ansible.builtin.file:
+    path: "{{ cert_dir }}"
+    state: directory
+
+- name: copy certificate to remote servers
+  ansible.builtin.copy:
+    src: "{{ cert_local_dir }}/{{ item }}"
+    dest: "{{ cert_dir }}/{{ item }}"
+  loop:
+    - "{{ kubelet_key_file }}"
+    - "{{ kubelet_cert_file }}"

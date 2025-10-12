@@ -21,7 +21,7 @@ version = 2
   [plugins."io.containerd.grpc.v1.cri".registry.auths]
 
   [plugins."io.containerd.grpc.v1.cri".registry.configs]
-    [plugins."io.containerd.grpc.v1.cri".registry.configs."10.100.176.62:8344".tls]
+    [plugins."io.containerd.grpc.v1.cri".registry.configs."{{ containerd_registry_ip }}:{{ containerd_registry_port }}".tls]
       insecure_skip_verify = {{ containerd_registry_insecure_skip_verify }}
     [plugins."io.containerd.grpc.v1.cri".registry.configs."{{ containerd_registry_ip }}:{{ containerd_registry_port }}".auth]
       auth = "{{ containerd_registry_auth }}"

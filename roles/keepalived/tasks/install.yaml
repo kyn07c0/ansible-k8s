@@ -27,7 +27,7 @@
       - libnl-route-3-dev
       - libnfnetlink-dev
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Download Keepalived from network
   ansible.builtin.get_url:
@@ -47,7 +47,7 @@
   ansible.builtin.unarchive:
     src: "/tmp/keepalived-{{ keepalived_version }}.tar.gz"
     dest: "/tmp"
-    remote_src: yes
+    remote_src: true
 
 - name: Compile and install Keepalived
   ansible.builtin.command: "{{ item }}"
@@ -59,17 +59,15 @@
     - make install
 
 - name: Ensure Keepalived scripts directory exists
-  file:
-    path: /usr/libexec/keepalived
+  ansible.builtin.file:
+    path: "{{ keepalived_script_dir }}"
     state: directory
     mode: '0755'
 
-- name: Create HAProxy check script
-  copy:
-    content: |
-      #!/bin/bash
-      /bin/kill -0 $(cat /var/run/haproxy.pid)
-    dest: "{{ haproxy_check_script }}"
+- name: Copy HAProxy check script
+  ansible.builtin.template:
+    src: haproxy_check.sh.j2
+    dest: "{{ keepalived_script_dir }}/haproxy_check.sh"
     mode: '0755'
 
 - name: Enable IP forwarding

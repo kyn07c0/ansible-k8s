@@ -1,7 +1,11 @@
 ---
 
-kubectl_version: 1.33.0
+kubectl_version: 1.34.0
 kubectl_binary_dir: /usr/local/bin
 
 kubectl_install_mode: network
 kubectl_local_binary_dir: /home/yura/k8s/binary
+
+kubectl_admin_key_file: admin.key
+kubectl_admin_csr_file: admin.csr
+kubectl_admin_cert_file: admin.crt

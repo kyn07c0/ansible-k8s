@@ -8,3 +8,13 @@ etcd_data_dir: /var/lib/etcd
 
 etcd_install_mode: network
 etcd_local_binary_dir: /home/yura/k8s/binary
+
+etcd_server_key_file: server.key
+etcd_server_csr_file: server.csr
+etcd_server_cert_file: server.crt
+etcd_peer_key_file: peer.key
+etcd_peer_csr_file: peer.csr
+etcd_peer_cert_file: peer.crt
+etcd_client_key_file: client.key
+etcd_client_csr_file: client.csr
+etcd_client_cert_file: client.crt

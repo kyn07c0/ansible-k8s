@@ -2,12 +2,14 @@
 
 host_name: "{{ inventory_hostname }}"
 cluster_name: k8s
-domain_name:  kubernetes.local
-fqdn: "{{ host_name }}.{{ domain_name }}"
+domain_name: local
+fqdn: "{{ host_name }}.{{ cluster_name }}.{{ domain_name }}"
 vip: 192.168.88.200
 
 cert_dir: /etc/kubernetes/pki
+cert_local_dir: ~/k8s/cert
 ca_key_file: ca.key
+ca_csr_file: ca.csr
 ca_cert_file: ca.crt
 cert_expiry_days: 1000
 key_size: 4096
@@ -15,4 +17,3 @@ key_type: RSA
 country_name: RU
 state_or_province_name: RUSSIA
 locality_name: Saint-Petersburg
-

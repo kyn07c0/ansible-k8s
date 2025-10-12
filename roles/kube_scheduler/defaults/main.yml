@@ -1,6 +1,6 @@
 ---
 
-kube_scheduler_version: 1.33.0
+kube_scheduler_version: 1.34.0
 
 kube_scheduler_extract_dir: /opt
 kube_scheduler_binary_dir: /usr/local/bin
@@ -10,3 +10,7 @@ kube_scheduler_install_mode: network
 kube_scheduler_local_binary_dir: /home/yura/k8s/binary
 
 kube_scheduler_kubeconfig_dir: /etc/kubernetes
+
+kube_scheduler_key_file: kube-scheduler.key
+kube_scheduler_csr_file: kube-scheduler.csr
+kube_scheduler_cert_file: kube-scheduler.crt

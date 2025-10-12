@@ -2,7 +2,7 @@
 
 - name: Set cluster list
   set_fact:
-    etcd_cluster_list: "{{ etcd_dns_names | zip(etcd_ips) | map('join', '=https://') | map('regex_replace', '$', ':2380') | join(',') }}"
+    etcd_cluster_list: "{{ etcd_dns | zip(etcd_ips) | map('join', '=https://') | map('regex_replace', '$', ':2380') | join(',') }}"
 
 - name: Check if etcd is already initialized
   ansible.builtin.stat:
@@ -25,8 +25,8 @@
 - name: Enable etcd service
   ansible.builtin.systemd:
     name: etcd
-    enabled: yes
-    daemon_reload: yes
+    enabled: true
+    daemon_reload: true
   when: etcd_unit_file.changed
 
 - name: Check started service
@@ -41,7 +41,13 @@
   when: etcd_service_status.state != 'started'
 
 - name: Verify etcd cluster health
-  command: etcdctl --endpoints=https://127.0.0.1:{{ etcd_client_port }} --cacert={{ cert_dir }}/ca.crt --cert={{ cert_dir }}/etcd/client.crt --key={{ cert_dir }}/etcd/client.key endpoint health
+  ansible.builtin.command: >
+    etcdctl
+    --endpoints=https://127.0.0.1:{{ etcd_client_port }}
+    --cacert={{ cert_dir }}/{{ ca_cert_file }}
+    --cert={{ cert_dir }}/etcd/{{ etcd_client_cert_file }}
+    --key={{ cert_dir }}/etcd/{{ etcd_client_key_file }}
+    endpoint health
   register: etcd_health
   changed_when: false
 

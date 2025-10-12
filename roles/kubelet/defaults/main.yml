@@ -1,6 +1,6 @@
 ---
 
-kubelet_version: 1.33.0
+kubelet_version: 1.34.0
 kubelet_extract_dir: /opt
 kubelet_binary_dir: /usr/local/bin
 kubelet_config_dir: /var/lib/kubelet
@@ -11,3 +11,7 @@ kubelet_local_binary_dir: /home/yura/k8s/binary
 kubelet_kubeconfig_dir: /etc/kubernetes
 
 resolv_conf: /etc/resolv.conf
+
+kubelet_key_file: kubelet.key
+kubelet_csr_file: kubelet.csr
+kubelet_cert_file: kubelet.crt

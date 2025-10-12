@@ -12,7 +12,7 @@
   ansible.builtin.systemd:
     name: kube-controller-manager
     state: started
-    enabled: yes
+    enabled: true
 
 - name: Check started service
   ansible.builtin.service:

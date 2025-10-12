@@ -1,0 +1,43 @@
+---
+
+- name: Create local cert directory
+  file:
+    path: "{{ cert_local_dir }}"
+    state: directory
+
+- name: CA exists
+  ansible.builtin.stat:
+    path: "{{ cert_local_dir }}/{{ ca_cert_file }}"
+  register: ca_file
+
+- block:
+
+    - name: Generate private key
+      community.crypto.openssl_privatekey:
+        path: "{{ cert_local_dir }}/{{ ca_key_file }}"
+        size: "{{ key_size }}"
+        type: "{{ key_type }}"
+        backup: true
+
+    - name: Generate certificate signing request with subject information
+      community.crypto.openssl_csr:
+        path: "{{ cert_local_dir }}/{{ ca_csr_file }}"
+        privatekey_path: "{{ cert_local_dir }}/{{ ca_key_file }}"
+        basic_constraints: "CA:TRUE"
+        key_usage:
+          - cRLSign
+          - keyCertSign
+        use_common_name_for_san: false
+        country_name: "{{ country_name }}"
+        common_name: "CA"
+        state_or_province_name: "{{ state_or_province_name }}"
+        locality_name: "{{ locality_name }}"
+
+    - name: Generate a self signed certificate
+      community.crypto.x509_certificate:
+        path: "{{ cert_local_dir }}/{{ ca_cert_file }}"
+        privatekey_path: "{{ cert_local_dir }}/{{ ca_key_file }}"
+        csr_path: "{{ cert_local_dir }}/{{ ca_csr_file }}"
+        provider: selfsigned
+
+  when: not ca_file.stat.exists

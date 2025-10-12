@@ -1,6 +1,6 @@
 ---
 
-crictl_version: 1.33.0
+crictl_version: 1.34.0
 
 crictl_extract_dir: /opt
 crictl_binary_dir: /usr/local/bin

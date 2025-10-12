@@ -5,7 +5,7 @@ global_defs {
 }
 
 vrrp_script haproxy_check {
-    script "{{ haproxy_check_script }}"
+    script "{{ keepalived_script_dir }}/haproxy_check.sh"
     interval 2
     weight 2
 }
@@ -20,9 +20,11 @@ vrrp_instance VI_1 {
         auth_type PASS
         auth_pass {{ keepalived_auth_pass }}
     }
+
     virtual_ipaddress {
         {{ virtual_ip }}
     }
+
     track_script {
         haproxy_check
     }

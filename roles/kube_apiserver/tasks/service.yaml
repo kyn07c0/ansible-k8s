@@ -11,13 +11,13 @@
   ansible.builtin.systemd:
     name: kube-apiserver
     state: started
-    enabled: yes
+    enabled: true
   when: ansible_service_facts.ansible_facts.services is not defined or ansible_service_facts.ansible_facts.services[service_name] is not defined
 
 - name: Reload systemd daemon and restart service
   ansible.builtin.systemd:
     name: kube-apiserver
-    daemon_reload: yes
+    daemon_reload: true
     state: restarted
   when: service_file_changed.changed
   notify: reload systemd

@@ -4,12 +4,13 @@ After=network.target
 Documentation=man:keepalived(8)
 
 [Service]
-Type=forking
+Type=simple
 PIDFile=/run/keepalived.pid
 ExecStart={{ keepalived_binary_dir }}/keepalived --dont-fork --log-console 
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=on-failure
-RestartSec=5s
+RestartSec=5
+TimeoutStartSec=300
 
 [Install]
 WantedBy=multi-user.target

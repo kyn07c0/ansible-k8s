@@ -10,14 +10,12 @@
     - preset
   tags: preset
 
-- name: selfsigned_cert
-  hosts:
-    - admin
-    - master
-    - worker
+- name: ca_certificate
+  hosts: localhost
   roles:
-    - selfsigned_cert
-  tags: selfsigned_cert
+    - ca_certificate
+  become: false
+  tags: ca_certificate
 
 - name: kubectl
   hosts:
@@ -34,6 +32,13 @@
     - etcd
   tags: etcd
 
+- name: kube_apiserver
+  hosts:
+    - master
+  roles:
+    - kube_apiserver
+  tags: kube-apiserver
+
 - name: haproxy
   hosts:
     - lb
@@ -44,17 +49,9 @@
 - name: keepalived
   hosts:
     - lb
-#  gather_facts: true
   roles:
     - keepalived
   tags: keepalived
-
-- name: kube_apiserver
-  hosts:
-    - master
-  roles:
-    - kube_apiserver
-  tags: kube-apiserver
 
 - name: kube_scheduler
   hosts:
