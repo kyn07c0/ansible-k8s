@@ -31,7 +31,7 @@
 
 - name: Generate a certificate signing request with subject information
   community.crypto.openssl_csr:
-    path: "{{ cert_local_dir }}/{{ kubelet_csr_file }}"
+    path: "{{ cert_local_dir }}/{{ inventory_hostname }}_{{ kubelet_csr_file }}"
     privatekey_path: "{{ cert_local_dir }}/{{ kubelet_key_file }}"
     basic_constraints: "CA:FALSE"
     extended_key_usage:
@@ -49,19 +49,17 @@
     subject_alt_name: "DNS:{{ inventory_hostname }},IP:127.0.0.1,IP:{{ ansible_host }}"
     create_subject_key_identifier: true
   delegate_to: localhost
-  run_once: true
   become: false
 
 - name: Generate a certificate
   community.crypto.x509_certificate:
-    path: "{{ cert_local_dir }}/{{ kubelet_cert_file }}"
+    path: "{{ cert_local_dir }}/{{ inventory_hostname }}_{{ kubelet_cert_file }}"
     privatekey_path: "{{ cert_local_dir }}/{{ kubelet_key_file }}"
-    csr_path: "{{ cert_local_dir }}/{{ kubelet_csr_file }}"
+    csr_path: "{{ cert_local_dir }}/{{ inventory_hostname }}_{{ kubelet_csr_file }}"
     ownca_path: "{{ cert_local_dir }}/{{ ca_cert_file }}"
     ownca_privatekey_path: "{{ cert_local_dir }}/{{ ca_key_file }}"
     provider: ownca
   delegate_to: localhost
-  run_once: true
   become: false
 
 ################################################################################
@@ -85,10 +83,12 @@
     path: "{{ cert_dir }}"
     state: directory
 
-- name: copy certificate to remote servers
+- name: copy kubelet key file to remote servers
   ansible.builtin.copy:
-    src: "{{ cert_local_dir }}/{{ item }}"
-    dest: "{{ cert_dir }}/{{ item }}"
-  loop:
-    - "{{ kubelet_key_file }}"
-    - "{{ kubelet_cert_file }}"
+    src: "{{ cert_local_dir }}/{{ kubelet_key_file }}"
+    dest: "{{ cert_dir }}/{{ kubelet_key_file }}"
+
+- name: copy kubelet certificate file to remote servers
+  ansible.builtin.copy:
+    src: "{{ cert_local_dir }}/{{ inventory_hostname }}_{{ kubelet_cert_file }}"
+    dest: "{{ cert_dir }}/{{ kubelet_cert_file }}"

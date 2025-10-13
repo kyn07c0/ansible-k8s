@@ -28,7 +28,7 @@
       ansible.builtin.unarchive:
         src: "https://github.com/etcd-io/etcd/releases/download/v{{ etcd_version }}/etcd-v{{ etcd_version }}-{{ os.stdout | lower }}-{{ architecture.stdout }}.tar.gz"
         dest: "{{ etcd_extract_dir }}"
-        remote_src: yes
+        remote_src: true
       when:
         - etcd_install_mode == 'network'
 
