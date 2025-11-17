@@ -6,12 +6,25 @@ Requires=containerd.service
 
 [Service]
 ExecStart={{ kubelet_binary_dir }}/kubelet \
-  --config={{ kubelet_config_dir}}/kubelet-config.yaml \
+  --config={{ kubelet_config_dir}}/config.yaml \
   --kubeconfig={{ kubelet_kubeconfig_dir }}/kubelet.kubeconfig \
   --register-node=true \
+  --root-dir=/var/lib/kubelet \
+  --image-gc-high-threshold=85 \
+  --image-gc-low-threshold=80 \
   --v=2
 Restart=on-failure
-RestartSec=5
+RestartSec=10
+
+# Security settings
+#NoNewPrivileges=yes
+#ProtectSystem=strict
+#ProtectHome=yes
+#ReadWritePaths=/var/lib/kubelet /var/lib/containerd /run/containerd
+#ProtectKernelTunables=yes
+#ProtectKernelModules=yes
+#ProtectControlGroups=yes
+#PrivateTmp=yes
 
 [Install]
 WantedBy=multi-user.target

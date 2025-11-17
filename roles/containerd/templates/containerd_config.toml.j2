@@ -1,19 +1,35 @@
 version = 2
+root = "/var/lib/containerd"                            # Корневая директория для данных
+state = "/run/containerd"                               # Директория для runtime состояния
+
+[grpc]
+  address = "/run/containerd/containerd.sock"           # Socket для коммуникации
+  max_recv_message_size = 16777216                      # Макс. размер входящих сообщений (16MB)
+  max_send_message_size = 16777216                      # Макс. размер исходящих сообщений (16MB)
+
+[metrics]
+  address = "127.0.0.1:1338"                            # Адрес для Prometheus метрик
+  grpc_histogram = false                                # Отключение gRPC гистограмм для производительности
 
 [plugins."io.containerd.grpc.v1.cri"]
 {% if containerd_registry_custom_enable %}
-  sandbox_image = "{{ containerd_registry_ip }}:{{ containerd_registry_port }}/pause:{{ containerd_image_pause_version }}"
+  sandbox_image = "{{ containerd_registry_ip }}:{{ containerd_registry_port }}/pause:{{ containerd_image_pause_version }}"      # Pause-контейнер для pod'ов
 {% endif %}
+
   [plugins."io.containerd.grpc.v1.cri".containerd]
-    snapshotter = "overlayfs"
-    default_runtime_name = "runc"
+    snapshotter = "overlayfs"                           # Драйвер для слоев образов
+    discard_unpacked_layers = true                      # Удалять распакованные слои после сборки
+    default_runtime_name = "runc"                       # Cтандартное исполняемое окружение (runtime)
+
   [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
-    runtime_type = "io.containerd.runc.v2"
-  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
-    SystemdCgroup = true
+    runtime_type = "io.containerd.runc.v2"              # Версия runtime
+
+    [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+      SystemdCgroup = true                              # Использовать systemd cgroups
+
 [plugins."io.containerd.grpc.v1.cri".cni]
-  bin_dir = "/opt/cni/bin"
-  conf_dir = "/etc/cni/net.d"
+  bin_dir = "/opt/cni/bin"                              # Директория исполняемых файлов плагинов CNI
+  conf_dir = "/etc/cni/net.d"                           # Директория файлов конфигурации для плагинов CNI
 
 {% if containerd_registry_custom_enable  %}
 [plugins."io.containerd.grpc.v1.cri".registry]
@@ -32,3 +48,12 @@ version = 2
     [plugins."io.containerd.grpc.v1.cri".registry.mirrors."{{ containerd_registry_ip }}:{{ containerd_registry_port }}"]
       endpoint = ["https://{{ containerd_registry_ip }}:{{ containerd_registry_port }}"]
 {% endif %}
+
+[plugins."io.containerd.internal.v1.opt"]
+  path = "/var/lib/containerd/opt"                      # Директория для опциональных данных
+
+[plugins."io.containerd.internal.v1.restart"]
+  interval = "10s"                                       # Интервал перезапуска контейнеров
+
+[plugins."io.containerd.monitor.v1.cgroups"]
+  no_prometheus = false                                  # Включить Prometheus метрики cgroups

@@ -17,8 +17,6 @@ rules:
       - nodes/log
       - nodes/spec
       - nodes/metrics
-      - nodes/exec
-      - nodes/portforward
     verbs:
       - "*"
 
@@ -36,4 +34,4 @@ roleRef:
 subjects:
   - apiGroup: rbac.authorization.k8s.io
     kind: User
-    name: kubernetes
+    name: kube-apiserver

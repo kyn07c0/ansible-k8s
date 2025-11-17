@@ -37,3 +37,4 @@
   ansible.builtin.command: >
     kubectl apply -f {{ kube_apiserver_conf_dir }}/kube-apiserver-to-kubelet.yaml
     --kubeconfig {{ kube_apiserver_kubeconf_dir }}/admin.kubeconfig
+  run_once: true

@@ -10,8 +10,9 @@
 - name: Enable and start containerd
   ansible.builtin.systemd:
     name: containerd
-    state: started
+    state: restarted
     enabled: true
+  when: config_file_status.changed
 
 - name: Check started service
   ansible.builtin.service:
