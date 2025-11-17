@@ -1,7 +1,7 @@
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
-address: 0.0.0.0                                       # Слушать на всех интерфейсах
-port: 10250                                            # Порт Kublet
+address: 0.0.0.0                                       # Адрес для прослушивания
+port: 10250                                            # Порт для API kubelet
 authentication:
   anonymous:
     enabled: false                                     # Отключить анонимный доступ
@@ -32,42 +32,44 @@ noProxy:
 
 # Eviction policies
 evictionHard:
-  imagefs.available: "15%"
-  memory.available: "100Mi"
-  nodefs.available: "10%"
-  nodefs.inodesFree: "5%"
+  imagefs.available: "15%"                              # Минимально доступное место для образов
+  memory.available: "100Mi"                             # Минимально доступная память
+  nodefs.available: "10%"                               # Минимально доступное место на диске
+  nodefs.inodesFree: "5%"                               # Минимально доступные inodes
 evictionSoft:
-  imagefs.available: "20%"
-  memory.available: "200Mi"
-  nodefs.available: "15%"
-  nodefs.inodesFree: "10%"
+  imagefs.available: "20%"                              # Предупреждение при 20% свободного места
+  memory.available: "200Mi"                             # Предупреждение при 200MB памяти
+  nodefs.available: "15%"                               # Предупреждение при 15% места на диске
+  nodefs.inodesFree: "10%"                              # Предупреждение при 10% inodes
 evictionSoftGracePeriod:
-  imagefs.available: "2m"
+  imagefs.available: "2m"                               # Время до выселения после превышения лимита
   memory.available: "2m"
   nodefs.available: "2m"
   nodefs.inodesFree: "2m"
-evictionPressureTransitionPeriod: 30s
-evictionMaxPodGracePeriod: 60
+evictionPressureTransitionPeriod: 30s                   # Время выхода из состояния давления
+evictionMaxPodGracePeriod: 60                           # Максимальный grace period для pod
 
 # Image garbage collection
-imageGCHighThresholdPercent: 85
-imageGCLowThresholdPercent: 80
-imageMinimumGCAge: 2m0s
+imageGCHighThresholdPercent: 85                         # Порог для запуска сборки мусора
+imageGCLowThresholdPercent: 80                          # Порог остановки сборки мусора
+imageMinimumGCAge: 2m0s                                 # Минимальный возраст образа перед удалением
 
 # System reservations
 systemReserved:
-  cpu: "100m"
-  memory: "256Mi"
+  cpu: "100m"                                           # Резерв CPU для системных процессов
+  memory: "256Mi"                                       # Резерв памяти для системных процессов
+  ephemeral-storage: "1Gi"                              # Резерв временного хранилища
 kubeReserved:
-  cpu: "100m"
-  memory: "512Mi"
+  cpu: "100m"                                           # Резерв CPU для kubelet
+  memory: "512Mi"                                       # Резерв памяти для kubelet
+  ephemeral-storage: "1Gi"                              # Резерв хранилища для kubelet
 enforceNodeAllocatable:
-  - "pods"
+  - "pods"                                              # Ограничения для pod'ов
 
 # Other settings
-maxPods: 250
-failSwapOn: true
-containerLogMaxSize: "10Mi"
-containerLogMaxFiles: 5
+maxPods: 250                                            # Максимальное количество pod'ов на узле
+failSwapOn: true                                        # Запретить работу при включенном swap
+containerLogMaxSize: "10Mi"                             # Максимальный размер лога контейнера
+containerLogMaxFiles: 5                                 # Максимальное количество лог-файлов
 featureGates:
   RotateKubeletServerCertificate: true
