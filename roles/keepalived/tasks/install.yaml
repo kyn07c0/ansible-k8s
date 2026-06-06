@@ -38,7 +38,7 @@
 
 - name: Download Keepalived from local dir
   ansible.builtin.copy:
-    src: "{{ keepalived_local_archive_dir }}/keepalived-{{ keepalived_version }}/"
+    src: "{{ keepalived_local_archive_dir }}/keepalived-{{ keepalived_version }}.tar.gz"
     dest: "/tmp/keepalived-{{ keepalived_version }}.tar.gz"
   when:
     - keepalived_install_mode == 'local'

@@ -1,41 +1,39 @@
----
-
 all:
   children:
     admin:
       hosts:
         admin:
-          ansible_host: 192.168.88.40
+          ansible_host: 192.168.122.40
     lb:
       hosts:
         lb1:
-          ansible_host: 192.168.88.51
+          ansible_host: 192.168.122.51
         lb2:
-          ansible_host: 192.168.88.52
+          ansible_host: 192.168.122.52
     master:
       hosts:
         master1:
-          ansible_host: 192.168.88.41
+          ansible_host: 192.168.122.41
           pod_subnet: 192.168.1.0/24
         master2:
-          ansible_host: 192.168.88.42
+          ansible_host: 192.168.122.42
           pod_subnet: 192.168.2.0/24
         master3:
-          ansible_host: 192.168.88.43
+          ansible_host: 192.168.122.43
           pod_subnet: 192.168.3.0/24
     worker:
       hosts:
         worker1:
-          ansible_host: 192.168.88.44
+          ansible_host: 192.168.122.44
           pod_subnet: 192.168.4.0/24
         worker2:
-          ansible_host: 192.168.88.45
+          ansible_host: 192.168.122.45
           pod_subnet: 192.168.5.0/24
     etcd:
       hosts:
         master1:
-          ansible_host: 192.168.88.41
+          ansible_host: 192.168.122.41
         master2:
-          ansible_host: 192.168.88.42
+          ansible_host: 192.168.122.42
         master3:
-          ansible_host: 192.168.88.43
+          ansible_host: 192.168.122.43

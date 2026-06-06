@@ -10,7 +10,7 @@
 
 - name: Stop playbook if file does not exist
   fail:
-    msg: "file {{ cert_local_dir }}/{{ ca_cert_file }} does not exist. Playbook stopped."
+    msg: "file {{ cert_local_dir }}/{{ ca_cert_file }} does not exist."
   when: not ca_file_status.stat.exists
   delegate_to: localhost
   run_once: true
@@ -20,7 +20,17 @@
   ansible.builtin.set_fact:
     san: "{{ san_dns + san_ips + san_local_host }}"
   vars:
-    san_local_host: ['DNS:localhost', 'DNS:kubernetes', 'DNS:kubernetes.default', 'DNS:kubernetes.default.svc', 'DNS:kubernetes.default.svc.cluster', 'DNS:kubernetes.svc.cluster.local', 'DNS:api-server.kubernetes.local', 'IP:127.0.0.1', 'IP:10.32.0.1', 'IP:{{ vip }}']
+    san_local_host:
+      - "DNS:localhost"
+      - "DNS:kubernetes"
+      - "DNS:kubernetes.default"
+      - "DNS:kubernetes.default.svc"
+      - "DNS:kubernetes.default.svc.cluster.local"
+      - "DNS:kubernetes.svc.cluster.local"
+      - "DNS:api-server.kubernetes.local"
+      - "IP:127.0.0.1"
+      - "IP:10.32.0.1"
+      - "IP:{{ vip }}"
     san_dns: "{{ groups['master'] | map('extract', hostvars, 'inventory_hostname') | map('regex_replace', '^', 'DNS:') | map('regex_replace', '$', '.' + cluster_name + '.' + domain_name) | list }}"
     san_ips: "{{ groups['master'] | map('extract', hostvars, 'ansible_host') | map('regex_replace', '^', 'IP:') | list }}"
 

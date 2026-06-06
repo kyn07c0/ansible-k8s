@@ -13,18 +13,12 @@ ExecStart={{ kubelet_binary_dir }}/kubelet \
   --image-gc-high-threshold=85 \
   --image-gc-low-threshold=80 \
   --v=2
-Restart=on-failure
-RestartSec=10
 
-# Security settings
-#NoNewPrivileges=yes
-#ProtectSystem=strict
-#ProtectHome=yes
-#ReadWritePaths=/var/lib/kubelet /var/lib/containerd /run/containerd
-#ProtectKernelTunables=yes
-#ProtectKernelModules=yes
-#ProtectControlGroups=yes
-#PrivateTmp=yes
+# Настройка автоматического перезапуска
+Restart=on-failure
+RestartSec=10s
+StartLimitInterval=60s
+StartLimitBurst=3
 
 [Install]
 WantedBy=multi-user.target

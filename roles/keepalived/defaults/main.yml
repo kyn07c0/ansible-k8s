@@ -6,6 +6,7 @@ keepalived_config_dir: /usr/etc/keepalived
 keepalived_script_dir: /usr/lib/keepalived
 
 keepalived_install_mode: network
+keepalived_local_archive_dir: /home/yura/k8s/binary
 
-virtual_ip: 192.168.88.200
+virtual_ip: 192.168.122.200
 keepalived_auth_pass: "qwerty"

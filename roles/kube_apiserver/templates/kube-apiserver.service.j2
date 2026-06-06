@@ -44,7 +44,7 @@ ExecStart=/usr/local/bin/kube-apiserver \
   --etcd-cafile="{{ cert_dir }}/{{ ca_cert_file }}" \
   --etcd-certfile="{{ cert_dir }}/etcd/client.crt" \
   --etcd-keyfile="{{ cert_dir }}/etcd/client.key" \
-  --etcd-servers=https://192.168.88.41:2379,https://192.168.88.42:2379,https://192.168.88.43:2379 \
+  --etcd-servers={{ etcd_servers_string }} \
   # Настройки логирования \
   --logging-format="json" \
   --log-flush-frequency="5s" \
