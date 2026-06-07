@@ -74,13 +74,13 @@
     - crictl
   tags: crictl
 
-- name: cni
-  hosts:
-    - master
-    - worker
-  roles:
-    - cni
-  tags: cni
+#- name: cni
+#  hosts:
+#    - master
+#    - worker
+#  roles:
+#    - cni
+#  tags: cni
 
 - name: pod_route
   hosts:
@@ -96,12 +96,12 @@
     - runc
   tags: runc
 
-- name: kube_proxy
-  hosts:
-    - worker
-  roles:
-    - kube_proxy
-  tags: kube-proxy
+#- name: kube_proxy
+#  hosts:
+#    - worker
+#  roles:
+#    - kube_proxy
+#  tags: kube-proxy
 
 - name: containerd
   hosts:
@@ -116,3 +116,10 @@
   roles:
     - kubelet
   tags: kubelet
+
+- name: cilium
+  hosts:
+    - localhost
+  roles:
+    - cilium
+  tags: cilium

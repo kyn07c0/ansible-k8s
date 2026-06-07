@@ -1,6 +1,6 @@
 ---
 
-kube_proxy_version: 1.34.0
+kube_proxy_version: 1.36.1
 
 kube_proxy_extract_dir: /opt
 kube_proxy_binary_dir: /usr/local/bin

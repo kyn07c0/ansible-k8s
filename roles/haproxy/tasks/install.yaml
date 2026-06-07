@@ -47,7 +47,7 @@
 
     - name: Download HAProxy from network
       ansible.builtin.get_url:
-        url: "https://www.haproxy.org/download/3.2/src/haproxy-{{ haproxy_version }}.tar.gz"
+        url: "https://www.haproxy.org/download/{{ haproxy_version[:3] }}/src/haproxy-{{ haproxy_version }}.tar.gz"
         dest: "/tmp/haproxy-{{ haproxy_version }}.tar.gz"
       when:
         - haproxy_install_mode == 'network'

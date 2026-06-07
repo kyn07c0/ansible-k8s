@@ -1,6 +1,6 @@
 ---
 
-haproxy_version: 3.2.5
+haproxy_version: 3.4.0
 haproxy_binary_dir: /usr/local/sbin
 haproxy_config_dir: /etc/haproxy
 

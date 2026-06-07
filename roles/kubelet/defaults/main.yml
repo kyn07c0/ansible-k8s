@@ -1,6 +1,6 @@
 ---
 
-kubelet_version: 1.34.0
+kubelet_version: 1.36.1
 kubelet_extract_dir: /opt
 kubelet_binary_dir: /usr/local/bin
 kubelet_config_dir: /var/lib/kubelet

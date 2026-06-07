@@ -1,6 +1,6 @@
 ---
 
-etcd_version: 3.6.4
+etcd_version: 3.6.12
 
 etcd_extract_dir: /opt
 etcd_binary_dir: /usr/local/bin
