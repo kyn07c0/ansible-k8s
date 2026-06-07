@@ -1,0 +1,21 @@
+---
+
+cilium_version: "1.19.4"
+cilium_namespace: kube-system
+cilium_release_name: cilium
+
+# Параметры установки
+kube_proxy_replacement: true
+routing_mode: "tunnel"
+tunnel_protocol: "geneve"
+k8s_service_host: "{{ vip }}" # VIP вашего haproxy
+k8s_service_port: 6443
+ipam_mode: kubernetes
+auto_direct_node_routes: true
+bpf_masquerade: true
+enable_hubble: true
+enable_hubble_ui: true
+bandwidth_manager: false # по желанию
+
+# Для проверок
+cilium_cli_version: "v0.15.23"

@@ -1,0 +1,105 @@
+---
+
+#- name: Установить Helm на управляющей машине (если не установлен)
+#  block:
+#    - name: Проверить наличие Helm
+#      command: helm version --short
+#      register: helm_installed
+#      changed_when: false
+#      ignore_errors: true
+
+#    - name: Установить Helm
+#      shell: |
+#        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+#      when: helm_installed.rc != 0
+#      args:
+#        creates: /usr/local/bin/helm
+
+- name: Добавить репозиторий Cilium
+  kubernetes.core.helm_repository:
+    name: cilium
+    repo_url: https://helm.cilium.io/
+    state: present
+
+- name: Создать namespace для Cilium (если не kube-system)
+  kubernetes.core.k8s:
+    kind: Namespace
+    name: "{{ cilium_namespace }}"
+    state: present
+  when: cilium_namespace != "kube-system"
+
+- name: Установить/обновить Cilium через Helm
+  kubernetes.core.helm:
+    name: "{{ cilium_release_name }}"
+    chart_ref: cilium/cilium
+    chart_version: "{{ cilium_version }}"
+    release_namespace: "{{ cilium_namespace }}"
+    create_namespace: false
+    kubeconfig: "{{ lookup('env', 'HOME') }}/.kube/config"
+    values:
+      kubeProxyReplacement: "{{ kube_proxy_replacement }}"
+      k8sServiceHost: "{{ k8s_service_host }}"
+      k8sServicePort: "{{ k8s_service_port }}"
+      routingMode: "{{ routing_mode }}"
+      tunnelProtocol: "{{ tunnel_protocol }}"
+      ipam:
+        mode: "{{ ipam_mode }}"
+      autoDirectNodeRoutes: "{{ auto_direct_node_routes }}"
+      bpf:
+        masquerade: "{{ bpf_masquerade }}"
+      hubble:
+        relay:
+          enabled: "{{ enable_hubble }}"
+        ui:
+          enabled: "{{ enable_hubble_ui }}"
+      bandwidthManager:
+        enabled: "{{ bandwidth_manager }}"
+    wait: true
+    timeout: 5m
+
+- name: Установить cilium-cli для проверки (опционально)
+  block:
+    - name: Скачать бинарник cilium
+      get_url:
+        url: "https://github.com/cilium/cilium-cli/releases/download/{{ cilium_cli_version }}/cilium-linux-amd64.tar.gz"
+        dest: /tmp/cilium.tar.gz
+    - name: Распаковать
+      unarchive:
+        src: /tmp/cilium.tar.gz
+        dest: /usr/local/bin
+        remote_src: true
+        creates: /usr/local/bin/cilium
+  when: install_cilium_cli | default(false) | bool
+
+- name: Дождаться готовности всех подов Cilium
+  kubernetes.core.k8s_info:
+    kind: Pod
+    namespace: "{{ cilium_namespace }}"
+    label_selectors:
+      - "k8s-app=cilium"
+    wait: true
+    wait_condition:
+      type: Ready
+      status: "True"
+    wait_timeout: 300
+
+- name: Проверить отсутствие kube-proxy (если ожидается замена)
+  block:
+    - name: Поиск DaemonSet kube-proxy
+      kubernetes.core.k8s_info:
+        api_version: apps/v1
+        kind: DaemonSet
+        name: kube-proxy
+        namespace: kube-system
+      register: kube_proxy_ds
+      failed_when: false
+
+    - name: Удалить kube-proxy, если обнаружен
+      kubernetes.core.k8s:
+        api_version: apps/v1
+        kind: DaemonSet
+        name: kube-proxy
+        namespace: kube-system
+        state: absent
+      when: kube_proxy_ds.resources | length > 0
+  when: kube_proxy_replacement == "strict"
