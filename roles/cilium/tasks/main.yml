@@ -75,6 +75,7 @@
   kubernetes.core.k8s_info:
     kind: Pod
     namespace: "{{ cilium_namespace }}"
+    kubeconfig: "{{ lookup('env', 'HOME') }}/.kube/config"
     label_selectors:
       - "k8s-app=cilium"
     wait: true

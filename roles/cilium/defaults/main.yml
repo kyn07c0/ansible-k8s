@@ -11,7 +11,7 @@ tunnel_protocol: "geneve"
 k8s_service_host: "{{ vip }}" # VIP вашего haproxy
 k8s_service_port: 6443
 ipam_mode: kubernetes
-auto_direct_node_routes: true
+auto_direct_node_routes: false
 bpf_masquerade: true
 enable_hubble: true
 enable_hubble_ui: true
