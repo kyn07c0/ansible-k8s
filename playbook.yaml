@@ -82,12 +82,12 @@
 #    - cni
 #  tags: cni
 
-- name: pod_route
-  hosts:
-    - worker
-  roles:
-    - pod_route
-  tags: pod_route
+#- name: pod_route
+#  hosts:
+#    - worker
+#  roles:
+#    - pod_route
+#  tags: pod_route
 
 - name: runc
   hosts:
