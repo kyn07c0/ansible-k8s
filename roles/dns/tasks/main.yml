@@ -4,9 +4,12 @@
   ansible.builtin.command: kubectl version --client
   changed_when: false
 
-- name: Create namespace kube-system (if not exist)
-  ansible.builtin.command: kubectl create namespace kube-system --dry-run=client -o yaml | kubectl apply -f -
-  changed_when: true
+#- name: Create namespace kube-system (if not exist)
+#  ansible.builtin.shell: |
+#    kubectl get namespace kube-system >/dev/null 2>&1 || \
+#    kubectl create namespace kube-system
+#  register: namespace_result
+#  changed_when: "'created' in namespace_result.stdout"
 
 - name: Apply RBAC for DNS
   ansible.builtin.template:
@@ -15,7 +18,7 @@
     mode: '0644'
 
 - name: Apply RBAC manifest
-  ansible.builtin.command: kubectl apply -f /tmp/dns-rbac.yaml
+  ansible.builtin.command: kubectl apply -f /tmp/dns-rbac.yaml --kubeconfig="{{ lookup('env', 'HOME') }}/.kube/config"
   changed_when: true
 
 - name: Deployment DNS
@@ -25,7 +28,7 @@
     mode: '0644'
 
 - name: Apply deployment manifest
-  ansible.builtin.command: kubectl apply -f /tmp/dns-deployment.yaml
+  ansible.builtin.command: kubectl apply -f /tmp/dns-deployment.yaml --kubeconfig="{{ lookup('env', 'HOME') }}/.kube/config"
   changed_when: true
 
 - name: Create service for DNS
@@ -35,7 +38,7 @@
     mode: '0644'
 
 - name: Apply service manifest
-  ansible.builtin.command: kubectl apply -f /tmp/dns-service.yaml
+  ansible.builtin.command: kubectl apply -f /tmp/dns-service.yaml --kubeconfig="{{ lookup('env', 'HOME') }}/.kube/config"
   changed_when: true
 
 - name: Waiting for readiness DNS pods
@@ -43,14 +46,19 @@
     kubectl wait --for=condition=ready pod \
       -l k8s-app=kube-dns \
       -n kube-system \
-      --timeout=300s
+      --timeout=300s \
+      --kubeconfig="{{ lookup('env', 'HOME') }}/.kube/config"
   changed_when: false
 
 - name: Checking DNS operation
   ansible.builtin.shell: |
-    kubectl run -n default test-dns --image=busybox:1.36 --restart=Never --rm -i -- \
-      nslookup kubernetes.default.svc.{{ k8s_dns_cluster_domain }} \
-      {{ k8s_dns_cluster_dns }}
+    kubectl run -n default test-dns \
+      --image=busybox:1.36 \
+      --restart=Never \
+      --kubeconfig="{{ lookup('env', 'HOME') }}/.kube/config" \
+      --rm -i -- \
+      nslookup kubernetes.default.svc.{{ dns_domain }} \
+      {{ dns_cluster }}
   changed_when: false
   ignore_errors: true
 

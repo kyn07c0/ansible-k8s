@@ -6,7 +6,7 @@ metadata:
   labels:
     k8s-app: metrics-server
 spec:
-  replicas: {{ k8s_metrics_replicas }}
+  replicas: {{ metrics_replicas }}
   selector:
     matchLabels:
       k8s-app: metrics-server
@@ -26,8 +26,8 @@ spec:
         - key: node-role.kubernetes.io/master
           operator: Exists
           effect: NoSchedule
-{% if k8s_metrics_tolerations | length > 0 %}
-{% for toleration in k8s_metrics_tolerations %}
+{% if metrics_tolerations | length > 0 %}
+{% for toleration in metrics_tolerations %}
         - key: {{ toleration.key | default('') }}
           operator: {{ toleration.operator | default('Equal') }}
 {% if toleration.value is defined %}
@@ -38,37 +38,37 @@ spec:
 {% endif %}
 {% endfor %}
 {% endif %}
-{% if k8s_metrics_node_selector | length > 0 %}
+{% if metrics_node_selector | length > 0 %}
       nodeSelector:
-{% for key, value in k8s_metrics_node_selector.items() %}
+{% for key, value in metrics_node_selector.items() %}
         {{ key }}: {{ value }}
 {% endfor %}
 {% endif %}
       containers:
         - name: metrics-server
-          image: registry.k8s.io/metrics-server/metrics-server:v{{ k8s_metrics_version }}
+          image: registry.k8s.io/metrics-server/metrics-server:v{{ metrics_version }}
           imagePullPolicy: IfNotPresent
           args:
             - --cert-dir=/tmp
             - --secure-port=10250
-            - --kubelet-preferred-address-types={{ k8s_metrics_kubelet_preferred_address_types }}
+            - --kubelet-preferred-address-types={{ metrics_kubelet_preferred_address_types }}
             - --kubelet-use-node-status-port
-            - --metric-resolution={{ k8s_metrics_resolution }}
-            - --kubelet-insecure-tls={{ k8s_metrics_kubelet_insecure_tls | lower }}
-            - --metric-duration={{ k8s_metrics_metric_duration }}
-            - --enable-hpa={{ k8s_metrics_enable_autoscaling | lower }}
-            - --enable-vpa={{ k8s_metrics_enable_autoscaling | lower }}
+            - --metric-resolution={{ metrics_resolution }}
+            - --kubelet-insecure-tls={{ metrics_kubelet_insecure_tls | lower }}
+            - --metric-duration={{ metrics_metric_duration }}
+            - --enable-hpa={{ metrics_enable_autoscaling | lower }}
+            - --enable-vpa={{ metrics_enable_autoscaling | lower }}
           ports:
             - name: https
               containerPort: 10250
               protocol: TCP
           resources:
             limits:
-              cpu: {{ k8s_metrics_cpu_limit }}
-              memory: {{ k8s_metrics_memory_limit }}
+              cpu: {{ metrics_cpu_limit }}
+              memory: {{ metrics_memory_limit }}
             requests:
-              cpu: {{ k8s_metrics_cpu_request }}
-              memory: {{ k8s_metrics_memory_request }}
+              cpu: {{ metrics_cpu_request }}
+              memory: {{ metrics_memory_request }}
           livenessProbe:
             failureThreshold: 3
             httpGet:

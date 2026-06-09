@@ -95,6 +95,13 @@
     - kubelet
   tags: kubelet
 
+- name: Installation cilium
+  hosts:
+    - localhost
+  roles:
+    - cilium
+  tags: cilium
+
 - name: Installation DNS
   hosts:
     - localhost
@@ -108,10 +115,3 @@
   roles:
     - metrics
   tags: metrics
-
-- name: Installation cilium
-  hosts:
-    - localhost
-  roles:
-    - cilium
-  tags: cilium

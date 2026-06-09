@@ -7,7 +7,7 @@ metadata:
     k8s-app: kube-dns
     kubernetes.io/name: CoreDNS
 spec:
-  replicas: {{ replicas }}
+  replicas: {{ dns_replicas }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -31,8 +31,8 @@ spec:
         - key: node-role.kubernetes.io/master
           operator: Exists
           effect: NoSchedule
-{% if tolerations | length > 0 %}
-{% for t in tolerations %}
+{% if dns_tolerations | length > 0 %}
+{% for t in dns_tolerations %}
         - key: {{ t.key | default('') }}
           operator: {{ t.operator | default('Equal') }}
 {% if t.value is defined %}
@@ -55,23 +55,23 @@ spec:
                       values:
                         - kube-dns
                 topologyKey: kubernetes.io/hostname
-{% if node_selector | length > 0 %}
+{% if dns_node_selector | length > 0 %}
       nodeSelector:
-{% for key, value in node_selector.items() %}
+{% for key, value in dns_node_selector.items() %}
         {{ key }}: {{ value }}
 {% endfor %}
 {% endif %}
       containers:
         - name: coredns
-          image: registry.k8s.io/coredns/coredns:v{{ coredns_version }}
+          image: registry.k8s.io/coredns/coredns:v{{ dns_version }}
           imagePullPolicy: IfNotPresent
           resources:
             limits:
-              cpu: {{ cpu_limit }}
-              memory: {{ memory_limit }}
+              cpu: {{ dns_cpu_limit }}
+              memory: {{ dns_memory_limit }}
             requests:
-              cpu: {{ cpu_request }}
-              memory: {{ memory_request }}
+              cpu: {{ dns_cpu_request }}
+              memory: {{ dns_memory_request }}
           args:
             - -conf
             - /etc/coredns/Corefile
@@ -111,7 +111,7 @@ spec:
               path: /ready
               port: 8181
               scheme: HTTP
-          dnsPolicy: Default
+      dnsPolicy: Default
       volumes:
         - name: config-volume
           configMap:

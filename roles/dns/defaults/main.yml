@@ -1,11 +1,11 @@
 ---
 
 # CoreDNS версия
-dns_version: "1.14.4"
+dns_version: "1.13.1"
 
 # Сетевые настройки
-dns_cluster_domain: "cluster.local"
-dns_cluster_dns: "10.32.0.10"
+dns_domain: "k8s.local"
+dns_cluster: "10.32.0.10"
 dns_service_cidr: "10.32.0.0/12"
 
 # Ресурсы

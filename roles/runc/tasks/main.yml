@@ -5,7 +5,7 @@
     path: "{{ runc_extract_dir }}/runc-{{ runc_version }}/runc"
   register: runc_file_found
 
-  name: Install runc if it is not already installed
+- name: Install runc if it is not already installed
   block:
 
     - name: Create runc directory

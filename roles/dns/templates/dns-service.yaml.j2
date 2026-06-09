@@ -11,13 +11,13 @@ data:
             lameduck 5s
         }
         ready
-        kubernetes {{ cluster_domain }} in-addr.arpa ip6.arpa {
+        kubernetes {{ dns_domain }} in-addr.arpa ip6.arpa {
             pods insecure
             fallthrough in-addr.arpa ip6.arpa
             ttl 30
         }
         prometheus :9153
-{% if proxy_enabled %}
+{% if dns_proxy_enabled %}
         forward . /etc/resolv.conf {
             max_concurrent 1000
         }
@@ -43,7 +43,7 @@ metadata:
 spec:
   selector:
     k8s-app: kube-dns
-  clusterIP: {{ cluster_dns }}
+  clusterIP: {{ dns_cluster }}
   ports:
     - name: dns
       port: 53

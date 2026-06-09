@@ -4,9 +4,9 @@
   ansible.builtin.command: kubectl version --client
   changed_when: false
 
-- name: Create namespace kube-system (if not exist)
-  ansible.builtin.command: kubectl create namespace kube-system --dry-run=client -o yaml | kubectl apply -f -
-  changed_when: true
+#- name: Create namespace kube-system (if not exist)
+#  ansible.builtin.command: kubectl create namespace kube-system --dry-run=client -o yaml | kubectl apply -f - --kubeconfig="{{ lookup('env', 'HOME') }}/.kube/config"
+#  changed_when: true
 
 - name: Apply RBAC for metrics server
   ansible.builtin.template:
@@ -15,7 +15,7 @@
     mode: '0644'
 
 - name: Apply RBAC manifest
-  ansible.builtin.command: kubectl apply -f /tmp/metrics-rbac.yaml
+  ansible.builtin.command: kubectl apply -f /tmp/metrics-rbac.yaml --kubeconfig="{{ lookup('env', 'HOME') }}/.kube/config"
   changed_when: true
 
 - name: Deployment metrics server
@@ -25,7 +25,7 @@
     mode: '0644'
 
 - name: Apply deployment manifest
-  ansible.builtin.command: kubectl apply -f /tmp/metrics-deployment.yaml
+  ansible.builtin.command: kubectl apply -f /tmp/metrics-deployment.yaml --kubeconfig="{{ lookup('env', 'HOME') }}/.kube/config"
   changed_when: true
 
 - name: Create APIService for metrics server
@@ -35,7 +35,7 @@
     mode: '0644'
 
 - name: Apply APIService manifest
-  ansible.builtin.command: kubectl apply -f /tmp/metrics-apiservice.yaml
+  ansible.builtin.command: kubectl apply -f /tmp/metrics-apiservice.yaml --kubeconfig="{{ lookup('env', 'HOME') }}/.kube/config"
   changed_when: true
 
 - name: Waiting for readiness metrics server pod
