@@ -1,0 +1,24 @@
+---
+
+# CoreDNS версия
+dns_version: "1.14.4"
+
+# Сетевые настройки
+dns_cluster_domain: "cluster.local"
+dns_cluster_dns: "10.32.0.10"
+dns_service_cidr: "10.32.0.0/12"
+
+# Ресурсы
+dns_replicas: 2
+dns_cpu_request: "100m"
+dns_cpu_limit: "500m"
+dns_memory_request: "70Mi"
+dns_memory_limit: "200Mi"
+
+# Нода для размещения (опционально)
+dns_node_selector: {}
+dns_tolerations: []
+
+# Прокси-настройки (если нужен upstream DNS)
+dns_upstream_dns: "8.8.8.8"
+dns_proxy_enabled: true

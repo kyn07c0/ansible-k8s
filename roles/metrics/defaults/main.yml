@@ -1,0 +1,26 @@
+---
+
+# Metrics Server версия
+metrics_version: "0.7.1"
+
+# Ресурсы
+metrics_cpu_request: "100m"
+metrics_cpu_limit: "500m"
+metrics_memory_request: "200Mi"
+metrics_memory_limit: "500Mi"
+
+# Реплики
+metrics_replicas: 1
+
+# Настройки сбора метрик
+metrics_resolution: "15s"
+metrics_metric_duration: "5m0s"
+metrics_kubelet_insecure_tls: true
+metrics_kubelet_preferred_address_types: "InternalIP,Hostname,ExternalIP"
+
+# Нода для размещения (опционально)
+metrics_node_selector: {}
+metrics_tolerations: []
+
+# Автомасштабирование (HPA/VPA требуют metrics-server)
+metrics_enable_autoscaling: true

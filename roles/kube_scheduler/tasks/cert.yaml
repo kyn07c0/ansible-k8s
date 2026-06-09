@@ -1,0 +1,82 @@
+---
+
+- name: Check for existence of CA file
+  stat:
+    path: "{{ cert_local_dir }}/{{ ca_cert_file }}"
+  register: ca_file_status
+  delegate_to: localhost
+  run_once: true
+  become: false
+
+- name: Stop playbook if file does not exist
+  fail:
+    msg: "file {{ cert_local_dir }}/{{ ca_cert_file }} does not exist."
+  when: not ca_file_status.stat.exists
+  delegate_to: localhost
+  run_once: true
+  become: false
+
+###############################################################################
+# Create a kube-scheduler certificate
+###############################################################################
+
+- name: Generate private key for component
+  community.crypto.openssl_privatekey:
+    path: "{{ cert_local_dir }}/{{ kube_scheduler_key_file }}"
+    size: "{{ key_size }}"
+    type: "{{ key_type }}"
+  delegate_to: localhost
+  run_once: true
+  become: false
+
+- name: Generate a certificate signing request with subject information
+  community.crypto.openssl_csr:
+    path: "{{ cert_local_dir }}/{{ kube_scheduler_csr_file }}"
+    privatekey_path: "{{ cert_local_dir }}/{{ kube_scheduler_key_file }}"
+    basic_constraints: "CA:FALSE"
+    extended_key_usage:
+      - clientAuth
+      - serverAuth
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    key_usage_critical: true
+    common_name: "system:kube-scheduler"
+    organization_name: "system:kube-scheduler"
+    country_name: "{{ country_name }}"
+    state_or_province_name: "{{ state_or_province_name }}"
+    locality_name: "{{ locality_name }}"
+    subject_alt_name: "DNS:kube-scheduler,IP:127.0.0.1"
+    create_subject_key_identifier: true
+  delegate_to: localhost
+  run_once: true
+  become: false
+
+- name: Generate a certificate
+  community.crypto.x509_certificate:
+    path: "{{ cert_local_dir }}/{{ kube_scheduler_cert_file }}"
+    privatekey_path: "{{ cert_local_dir }}/{{ kube_scheduler_key_file }}"
+    csr_path: "{{ cert_local_dir }}/{{ kube_scheduler_csr_file }}"
+    ownca_path: "{{ cert_local_dir }}/{{ ca_cert_file }}"
+    ownca_privatekey_path: "{{ cert_local_dir }}/{{ ca_key_file }}"
+    provider: ownca
+  delegate_to: localhost
+  run_once: true
+  become: false
+
+################################################################################
+# Copy kube-scheduler certificate to remote servers
+################################################################################
+
+- name: Create directory for kube-scheduler certificate
+  ansible.builtin.file:
+    path: "{{ cert_dir }}"
+    state: directory
+
+- name: Copy certificate to remote servers
+  ansible.builtin.copy:
+    src: "{{ cert_local_dir }}/{{ item }}"
+    dest: "{{ cert_dir }}/{{ item }}"
+  loop:
+    - "{{ kube_scheduler_key_file }}"
+    - "{{ kube_scheduler_cert_file }}"

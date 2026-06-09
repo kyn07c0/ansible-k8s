@@ -1,0 +1,78 @@
+---
+
+- name: Create HAProxy configuration directory
+  ansible.builtin.file:
+    path: "{{ haproxy_config_dir }}"
+    state: directory
+
+- name: Copy file configuration HAProxy
+  ansible.builtin.template:
+    src: haproxy.cfg.j2
+    dest: "{{ haproxy_config_dir }}/haproxy.cfg"
+    mode: '0640'
+
+- name: Install packages
+  ansible.builtin.package:
+    name:
+      - build-essential
+      - libssl-dev
+      - libpcre2-32-0
+      - libpcre2-dev
+      - zlib1g-dev
+      - pcre2-utils
+    state: present
+    update_cache: true
+
+- name: Checking the installation of HAProxy
+  ansible.builtin.stat:
+    path: "{{ haproxy_binary_dir }}/haproxy"
+  register: haproxy_file_found
+
+- name: Install HaProxy if it is not already installed
+  block:
+
+    - name: Create HAProxy group
+      ansible.builtin.group:
+        name: haproxy
+        system: true
+        state: present
+
+    - name: Create HAProxy user
+      ansible.builtin.user:
+        name: haproxy
+        group: haproxy
+        system: true
+        shell: /usr/sbin/nologin
+        home: /var/lib/haproxy
+        create_home: true
+
+    - name: Download HAProxy from network
+      ansible.builtin.get_url:
+        url: "https://www.haproxy.org/download/{{ haproxy_version[:3] }}/src/haproxy-{{ haproxy_version }}.tar.gz"
+        dest: "/tmp/haproxy-{{ haproxy_version }}.tar.gz"
+      when:
+        - haproxy_install_mode == 'network'
+
+    - name: Download HAProxy from local dir
+      ansible.builtin.copy:
+        src: "{{ haproxy_local_binary_dir }}/haproxy-{{ haproxy_version }}.tar.gz"
+        dest: "/tmp/haproxy-{{ haproxy_version }}.tar.gz"
+      when:
+        - haproxy_install_mode == 'local'
+
+    - name: Extract HAProxy source
+      ansible.builtin.unarchive:
+        src: "/tmp/haproxy-{{ haproxy_version }}.tar.gz"
+        dest: "/tmp"
+        remote_src: true
+
+    - name: Compile and install HAProxy
+      ansible.builtin.command: "{{ item }}"
+      args:
+        chdir: "/tmp/haproxy-{{ haproxy_version }}"
+      loop:
+        - make TARGET=linux-glibc USE_OPENSSL=1 USE_ZLIB=1
+        - make install
+
+  when:
+    - not haproxy_file_found.stat.exists

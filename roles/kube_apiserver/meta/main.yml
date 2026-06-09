@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: kyn
-  description: Installation kube-proxy on Kubernetes cluster
+  description: Installation kube-apiserver on Kubernetes cluster
   company:
 
   # If the issue tracker for your role is not on github, uncomment the

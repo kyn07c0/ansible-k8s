@@ -1,139 +1,117 @@
 ---
 
-- name: preset
+- name: Preset
   hosts:
     - admin
     - lb
     - master
     - worker
   roles:
-    - os_preset
+    - preset
   tags: preset
 
-- name: ca_certificate
+- name: Generation ca certificate
   hosts: localhost
   roles:
-    - os_ca_certificate
+    - ca_certificate
   become: false
   tags: ca_certificate
 
-- name: kubectl
+- name: Installation kubectl
   hosts:
     - admin
     - master
     - worker
   roles:
-    - os_kubectl
+    - kubectl
   tags: kubectl
 
-- name: etcd
+- name: Installation etcd
   hosts: etcd
   roles:
-    - os_etcd
+    - etcd
   tags: etcd
 
-- name: kube_apiserver
+- name: Installation kube-apiserver
   hosts:
     - master
   roles:
-    - os_kube_apiserver
+    - kube_apiserver
   tags: kube-apiserver
 
-- name: haproxy
+- name: Installation haproxy
   hosts:
     - lb
   roles:
-    - os_haproxy
+    - haproxy
   tags: haproxy
 
-- name: keepalived
+- name: Installation keepalived
   hosts:
     - lb
   roles:
-    - os_keepalived
+    - keepalived
   tags: keepalived
 
-- name: kube_scheduler
+- name: Installation kube-scheduler
   hosts:
     - master
   roles:
-    - os_kube_scheduler
+    - kube_scheduler
   tags: kube-scheduler
 
-- name: kube_controller_manager
+- name: Installation kube-controller-manager
   hosts:
     - master
   roles:
-    - os_kube_controller_manager
+    - kube_controller_manager
   tags: kube-controller-manager
 
-- name: crictl
+- name: Installation crictl
   hosts:
     - worker
   roles:
-    - os_crictl
+    - crictl
   tags: crictl
 
-#- name: cni
-#  hosts:
-#    - master
-#    - worker
-#  roles:
-#    - cni
-#  tags: cni
-
-#- name: pod_route
-#  hosts:
-#    - worker
-#  roles:
-#    - pod_route
-#  tags: pod_route
-
-- name: runc
+- name: Installation runc
   hosts:
     - worker
   roles:
-    - os_runc
+    - runc
   tags: runc
 
-#- name: kube_proxy
-#  hosts:
-#    - worker
-#  roles:
-#    - kube_proxy
-#  tags: kube-proxy
-
-- name: containerd
+- name: Installation containerd
   hosts:
     - worker
   roles:
-    - os_containerd
+    - containerd
   tags: containerd
 
-- name: kubelet
+- name: Installation kubelet
   hosts:
     - worker
   roles:
-    - os_kubelet
+    - kubelet
   tags: kubelet
 
-- name: dns
+- name: Installation DNS
   hosts:
     - localhost
   roles:
-    - k8s_dns
+    - dns
   tags: dns
 
-- name: metrics
+- name: Installation metrics
   hosts:
     - localhost
   roles:
-    - k8s_metrics
+    - metrics
   tags: metrics
 
-- name: cilium
+- name: Installation cilium
   hosts:
     - localhost
   roles:
-    - k8s_cilium
+    - cilium
   tags: cilium
