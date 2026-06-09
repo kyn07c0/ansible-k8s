@@ -1,34 +1,19 @@
 ---
 
-#- name: Установить Helm на управляющей машине (если не установлен)
-#  block:
-#    - name: Проверить наличие Helm
-#      command: helm version --short
-#      register: helm_installed
-#      changed_when: false
-#      ignore_errors: true
-
-#    - name: Установить Helm
-#      shell: |
-#        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-#      when: helm_installed.rc != 0
-#      args:
-#        creates: /usr/local/bin/helm
-
-- name: Добавить репозиторий Cilium
+- name: Add repository Cilium
   kubernetes.core.helm_repository:
     name: cilium
     repo_url: https://helm.cilium.io/
     state: present
 
-- name: Создать namespace для Cilium (если не kube-system)
+- name: Create namespace for Cilium
   kubernetes.core.k8s:
     kind: Namespace
     name: "{{ cilium_namespace }}"
     state: present
   when: cilium_namespace != "kube-system"
 
-- name: Установить/обновить Cilium через Helm
+- name: Install/update Cilium
   kubernetes.core.helm:
     name: "{{ cilium_release_name }}"
     chart_ref: cilium/cilium
@@ -57,7 +42,7 @@
     wait: true
     timeout: 5m
 
-- name: Установить cilium-cli для проверки (опционально)
+- name: Install cilium-cli for test
   block:
     - name: Скачать бинарник cilium
       get_url:
@@ -71,7 +56,7 @@
         creates: /usr/local/bin/cilium
   when: install_cilium_cli | default(false) | bool
 
-- name: Дождаться готовности всех подов Cilium
+- name: Waiting ready all pods Cilium
   kubernetes.core.k8s_info:
     kind: Pod
     namespace: "{{ cilium_namespace }}"
@@ -83,24 +68,3 @@
       type: Ready
       status: "True"
     wait_timeout: 300
-
-- name: Проверить отсутствие kube-proxy (если ожидается замена)
-  block:
-    - name: Поиск DaemonSet kube-proxy
-      kubernetes.core.k8s_info:
-        api_version: apps/v1
-        kind: DaemonSet
-        name: kube-proxy
-        namespace: kube-system
-      register: kube_proxy_ds
-      failed_when: false
-
-    - name: Удалить kube-proxy, если обнаружен
-      kubernetes.core.k8s:
-        api_version: apps/v1
-        kind: DaemonSet
-        name: kube-proxy
-        namespace: kube-system
-        state: absent
-      when: kube_proxy_ds.resources | length > 0
-  when: kube_proxy_replacement == "strict"
