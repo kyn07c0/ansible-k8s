@@ -8,37 +8,37 @@
   ansible.builtin.command: kubectl create namespace kube-system --dry-run=client -o yaml | kubectl apply -f -
   changed_when: true
 
-- name: Apply RBAC for CoreDNS
+- name: Apply RBAC for DNS
   ansible.builtin.template:
-    src: coredns-rbac.yaml.j2
-    dest: /tmp/coredns-rbac.yaml
+    src: dns-rbac.yaml.j2
+    dest: /tmp/dns-rbac.yaml
     mode: '0644'
 
 - name: Apply RBAC manifest
-  ansible.builtin.command: kubectl apply -f /tmp/coredns-rbac.yaml
+  ansible.builtin.command: kubectl apply -f /tmp/dns-rbac.yaml
   changed_when: true
 
-- name: Deployment CoreDNS
+- name: Deployment DNS
   ansible.builtin.template:
-    src: coredns-deployment.yaml.j2
-    dest: /tmp/coredns-deployment.yaml
+    src: dns-deployment.yaml.j2
+    dest: /tmp/dns-deployment.yaml
     mode: '0644'
 
 - name: Apply deployment manifest
-  ansible.builtin.command: kubectl apply -f /tmp/coredns-deployment.yaml
+  ansible.builtin.command: kubectl apply -f /tmp/dns-deployment.yaml
   changed_when: true
 
-- name: Create service for CoreDNS
+- name: Create service for DNS
   ansible.builtin.template:
-    src: coredns-service.yaml.j2
-    dest: /tmp/coredns-service.yaml
+    src: dns-service.yaml.j2
+    dest: /tmp/dns-service.yaml
     mode: '0644'
 
 - name: Apply service manifest
-  ansible.builtin.command: kubectl apply -f /tmp/coredns-service.yaml
+  ansible.builtin.command: kubectl apply -f /tmp/dns-service.yaml
   changed_when: true
 
-- name: Waiting for readiness CoreDNS pods
+- name: Waiting for readiness DNS pods
   ansible.builtin.shell: |
     kubectl wait --for=condition=ready pod \
       -l k8s-app=kube-dns \
@@ -49,8 +49,8 @@
 - name: Checking DNS operation
   ansible.builtin.shell: |
     kubectl run -n default test-dns --image=busybox:1.36 --restart=Never --rm -i -- \
-      nslookup kubernetes.default.svc.{{ cluster_domain }} \
-      {{ cluster_dns }}
+      nslookup kubernetes.default.svc.{{ k8s_dns_cluster_domain }} \
+      {{ k8s_dns_cluster_dns }}
   changed_when: false
   ignore_errors: true
 
@@ -62,4 +62,3 @@
     - coredns-rbac.yaml
     - coredns-deployment.yaml
     - coredns-service.yaml
-

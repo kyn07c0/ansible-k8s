@@ -1,24 +1,24 @@
 ---
 
 # CoreDNS версия
-version: "1.14.4"
+k8s_dns_version: "1.14.4"
 
 # Сетевые настройки
-cluster_domain: "cluster.local"
-cluster_dns: "10.32.0.10"
-service_cidr: "10.32.0.0/12"
+k8s_dns_cluster_domain: "cluster.local"
+k8s_dns_cluster_dns: "10.32.0.10"
+k8s_dns_service_cidr: "10.32.0.0/12"
 
 # Ресурсы
-replicas: 2
-cpu_request: "100m"
-cpu_limit: "500m"
-memory_request: "70Mi"
-memory_limit: "200Mi"
+k8s_dns_replicas: 2
+k8s_dns_cpu_request: "100m"
+k8s_dns_cpu_limit: "500m"
+k8s_dns_memory_request: "70Mi"
+k8s_dns_memory_limit: "200Mi"
 
 # Нода для размещения (опционально)
-node_selector: {}
-tolerations: []
+k8s_dns_node_selector: {}
+k8s_dns_tolerations: []
 
 # Прокси-настройки (если нужен upstream DNS)
-upstream_dns: "8.8.8.8"
-proxy_enabled: true
+k8s_dns_upstream_dns: "8.8.8.8"
+k8s_dns_proxy_enabled: true
