@@ -124,6 +124,13 @@
     - k8s_dns
   tags: dns
 
+- name: metrics
+  hosts:
+    - localhost
+  roles:
+    - k8s_metrics
+  tags: metrics
+
 - name: cilium
   hosts:
     - localhost

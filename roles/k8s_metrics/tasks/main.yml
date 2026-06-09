@@ -1,0 +1,67 @@
+---
+
+- name: Availability check kubectl
+  ansible.builtin.command: kubectl version --client
+  changed_when: false
+
+- name: Create namespace kube-system (if not exist)
+  ansible.builtin.command: kubectl create namespace kube-system --dry-run=client -o yaml | kubectl apply -f -
+  changed_when: true
+
+- name: Apply RBAC for metrics server
+  ansible.builtin.template:
+    src: metrics-rbac.yaml.j2
+    dest: /tmp/metrics-rbac.yaml
+    mode: '0644'
+
+- name: Apply RBAC manifest
+  ansible.builtin.command: kubectl apply -f /tmp/metrics-rbac.yaml
+  changed_when: true
+
+- name: Deployment metrics server
+  ansible.builtin.template:
+    src: metrics-deployment.yaml.j2
+    dest: /tmp/metrics-deployment.yaml
+    mode: '0644'
+
+- name: Apply deployment manifest
+  ansible.builtin.command: kubectl apply -f /tmp/metrics-deployment.yaml
+  changed_when: true
+
+- name: Create APIService for metrics server
+  ansible.builtin.template:
+    src: metrics-apiservice.yaml.j2
+    dest: /tmp/metrics-apiservice.yaml
+    mode: '0644'
+
+- name: Apply APIService manifest
+  ansible.builtin.command: kubectl apply -f /tmp/metrics-apiservice.yaml
+  changed_when: true
+
+- name: Waiting for readiness metrics server pod
+  ansible.builtin.shell: |
+    kubectl wait --for=condition=ready pod \
+      -l k8s-app=metrics-server \
+      -n kube-system \
+      --timeout=300s
+  changed_when: false
+
+- name: Waiting for readiness API metric
+  ansible.builtin.shell: |
+    kubectl top nodes
+  changed_when: false
+  register: metrics_test
+  ignore_errors: true
+
+- name: Output of the metrics check result
+  ansible.builtin.debug:
+    msg: "{{ metrics_test.stdout_lines }}"
+
+- name: Deleting temporary manifests
+  ansible.builtin.file:
+    path: "/tmp/{{ item }}"
+    state: absent
+  loop:
+    - metrics-rbac.yaml
+    - metrics-deployment.yaml
+    - metrics-apiservice.yaml
