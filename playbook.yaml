@@ -7,13 +7,13 @@
     - master
     - worker
   roles:
-    - preset
+    - os_preset
   tags: preset
 
 - name: ca_certificate
   hosts: localhost
   roles:
-    - ca_certificate
+    - os_ca_certificate
   become: false
   tags: ca_certificate
 
@@ -23,55 +23,55 @@
     - master
     - worker
   roles:
-    - kubectl
+    - os_kubectl
   tags: kubectl
 
 - name: etcd
   hosts: etcd
   roles:
-    - etcd
+    - os_etcd
   tags: etcd
 
 - name: kube_apiserver
   hosts:
     - master
   roles:
-    - kube_apiserver
+    - os_kube_apiserver
   tags: kube-apiserver
 
 - name: haproxy
   hosts:
     - lb
   roles:
-    - haproxy
+    - os_haproxy
   tags: haproxy
 
 - name: keepalived
   hosts:
     - lb
   roles:
-    - keepalived
+    - os_keepalived
   tags: keepalived
 
 - name: kube_scheduler
   hosts:
     - master
   roles:
-    - kube_scheduler
+    - os_kube_scheduler
   tags: kube-scheduler
 
 - name: kube_controller_manager
   hosts:
     - master
   roles:
-    - kube_controller_manager
+    - os_kube_controller_manager
   tags: kube-controller-manager
 
 - name: crictl
   hosts:
     - worker
   roles:
-    - crictl
+    - os_crictl
   tags: crictl
 
 #- name: cni
@@ -93,7 +93,7 @@
   hosts:
     - worker
   roles:
-    - runc
+    - os_runc
   tags: runc
 
 #- name: kube_proxy
@@ -107,19 +107,26 @@
   hosts:
     - worker
   roles:
-    - containerd
+    - os_containerd
   tags: containerd
 
 - name: kubelet
   hosts:
     - worker
   roles:
-    - kubelet
+    - os_kubelet
   tags: kubelet
+
+- name: dns
+  hosts:
+    - localhost
+  roles:
+    - k8s_dns
+  tags: dns
 
 - name: cilium
   hosts:
     - localhost
   roles:
-    - cilium
+    - k8s_cilium
   tags: cilium

@@ -1,0 +1,86 @@
+---
+
+- name: Проверка доступности kubectl
+  ansible.builtin.command: kubectl version --client
+  changed_when: false
+  delegate_to: "{{ groups['admin'] | first }}"
+  run_once: true
+
+- name: Создание namespace kube-system (если отсутствует)
+  ansible.builtin.command: kubectl create namespace kube-system --dry-run=client -o yaml | kubectl apply -f -
+  changed_when: true
+  delegate_to: "{{ groups['admin'] | first }}"
+  run_once: true
+
+- name: Применение RBAC для CoreDNS
+  ansible.builtin.template:
+    src: coredns-rbac.yaml.j2
+    dest: /tmp/coredns-rbac.yaml
+    mode: '0644'
+  delegate_to: "{{ groups['admin'] | first }}"
+  run_once: true
+
+- name: Применение RBAC манифеста
+  ansible.builtin.command: kubectl apply -f /tmp/coredns-rbac.yaml
+  changed_when: true
+  delegate_to: "{{ groups['admin'] | first }}"
+  run_once: true
+
+- name: Развёртывание CoreDNS Deployment
+  ansible.builtin.template:
+    src: coredns-deployment.yaml.j2
+    dest: /tmp/coredns-deployment.yaml
+    mode: '0644'
+  delegate_to: "{{ groups['admin'] | first }}"
+  run_once: true
+
+- name: Применение Deployment манифеста
+  ansible.builtin.command: kubectl apply -f /tmp/coredns-deployment.yaml
+  changed_when: true
+  delegate_to: "{{ groups['admin'] | first }}"
+  run_once: true
+
+- name: Создание Service для CoreDNS
+  ansible.builtin.template:
+    src: coredns-service.yaml.j2
+    dest: /tmp/coredns-service.yaml
+    mode: '0644'
+  delegate_to: "{{ groups['admin'] | first }}"
+  run_once: true
+
+- name: Применение Service манифеста
+  ansible.builtin.command: kubectl apply -f /tmp/coredns-service.yaml
+  changed_when: true
+  delegate_to: "{{ groups['admin'] | first }}"
+  run_once: true
+
+- name: Ожидание готовности CoreDNS подов
+  ansible.builtin.shell: |
+    kubectl wait --for=condition=ready pod \
+      -l k8s-app=kube-dns \
+      -n kube-system \
+      --timeout=300s
+  changed_when: false
+  delegate_to: "{{ groups['admin'] | first }}"
+  run_once: true
+
+- name: Проверка работы DNS
+  ansible.builtin.shell: |
+    kubectl run -n default test-dns --image=busybox:1.36 --restart=Never --rm -i -- \
+      nslookup kubernetes.default.svc.{{ cluster_domain }} \
+      {{ cluster_dns }}
+  changed_when: false
+  delegate_to: "{{ groups['admin'] | first }}"
+  run_once: true
+  ignore_errors: true
+
+- name: Удаление временных манифестов
+  ansible.builtin.file:
+    path: "/tmp/{{ item }}"
+    state: absent
+  loop:
+    - coredns-rbac.yaml
+    - coredns-deployment.yaml
+    - coredns-service.yaml
+  delegate_to: "{{ groups['admin'] | first }}"
+  run_once: true
