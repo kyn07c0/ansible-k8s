@@ -7,7 +7,7 @@
 
 - name: Disable swap in current session
   ansible.builtin.command: swapoff -a
-  when: swap_info.stdout != ""
+  when: swap_info.stdout != "" | length > 0
 
 - name: Disable swap after reboot
   ansible.builtin.replace:
