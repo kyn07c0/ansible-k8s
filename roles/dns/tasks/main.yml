@@ -4,13 +4,6 @@
   ansible.builtin.command: kubectl version --client
   changed_when: false
 
-#- name: Create namespace kube-system (if not exist)
-#  ansible.builtin.shell: |
-#    kubectl get namespace kube-system >/dev/null 2>&1 || \
-#    kubectl create namespace kube-system
-#  register: namespace_result
-#  changed_when: "'created' in namespace_result.stdout"
-
 - name: Apply RBAC for DNS
   ansible.builtin.template:
     src: dns-rbac.yaml.j2
