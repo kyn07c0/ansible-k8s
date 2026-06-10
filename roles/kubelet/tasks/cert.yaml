@@ -25,6 +25,7 @@
     path: "{{ cert_local_dir }}/{{ kubelet_key_file }}"
     size: "{{ key_size }}"
     type: "{{ key_type }}"
+    mode: '0600'
   delegate_to: localhost
   run_once: true
   become: false
