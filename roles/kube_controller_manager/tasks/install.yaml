@@ -6,8 +6,9 @@
   register: kube_controller_manager_file_found
 
 - name: Install kube-controller if it is not already installed
+  when:
+    - not kube_controller_manager_file_found.stat.exists
   block:
-
     - name: Create controller-manager directory
       ansible.builtin.file:
         path: "{{ kube_controller_manager_extract_dir }}/kube-controller-manager-{{ kube_controller_manager_version }}"
@@ -40,7 +41,4 @@
         src: "{{ kube_controller_manager_extract_dir }}/kube-controller-manager-{{ kube_controller_manager_version }}/kube-controller-manager"
         path: "{{ kube_controller_manager_binary_dir }}/kube-controller-manager"
         state: link
-        mode: a+x
-
-  when:
-    - not kube_controller_manager_file_found.stat.exists
+        mode: '0777'

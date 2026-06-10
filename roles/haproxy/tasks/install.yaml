@@ -29,8 +29,9 @@
   register: haproxy_file_found
 
 - name: Install HaProxy if it is not already installed
+  when:
+    - not haproxy_file_found.stat.exists
   block:
-
     - name: Create HAProxy group
       ansible.builtin.group:
         name: haproxy
@@ -73,6 +74,3 @@
       loop:
         - make TARGET=linux-glibc USE_OPENSSL=1 USE_ZLIB=1
         - make install
-
-  when:
-    - not haproxy_file_found.stat.exists

@@ -50,6 +50,7 @@
     timeout: 5m
 
 - name: Install cilium-cli for test
+  when: install_cilium_cli | default(false) | bool
   block:
     - name: Скачать бинарник cilium
       get_url:
@@ -61,7 +62,6 @@
         dest: /usr/local/bin
         remote_src: true
         creates: /usr/local/bin/cilium
-  when: install_cilium_cli | default(false) | bool
 
 - name: Waiting ready all pods Cilium
   kubernetes.core.k8s_info:

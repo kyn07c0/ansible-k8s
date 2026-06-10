@@ -6,8 +6,9 @@
   register: kubectl_file_found
 
 - name: Install kubectl if it is not already installed
+  when:
+    - not kubectl_file_found.stat.exists
   block:
-
     - name: Getting the OS name
       ansible.builtin.shell: uname -s
       register: os
@@ -31,6 +32,3 @@
         mode: u+x
       when:
         - kubectl_install_mode == 'local'
-
-  when:
-    - not kubectl_file_found.stat.exists

@@ -9,8 +9,10 @@
     path: "{{ cert_dir }}/{{ kubectl_admin_cert_file }}"
   register: admin_cert_file
 
-- block:
-
+- name: Generate admin certificate
+  when:
+    - not admin_cert_file.stat.exists
+  block:
     - name: Generate private key for kubectl admin
       community.crypto.openssl_privatekey:
         path: "{{ cert_local_dir }}/{{ kubectl_admin_key_file }}"
@@ -53,8 +55,6 @@
       delegate_to: localhost
       run_once: true
       become: false
-
-  when: not admin_cert_file.stat.exists
 
 ################################################################################
 # Copy CA to remote servers

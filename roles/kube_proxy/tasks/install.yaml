@@ -24,8 +24,10 @@
     path: "{{ kube_proxy_extract_dir }}/kube-proxy-{{ kube_proxy_version }}/kube-proxy"
   register: kube_proxy_file_found
 
-- block:
-
+- name: Install kube-proxy
+  when:
+    - not kube_proxy_file_found.stat.exists
+  block:
     - name: Create kube-proxy directory
       ansible.builtin.file:
         path: "{{ kube_proxy_extract_dir }}/kube-proxy-{{ kube_proxy_version }}"
@@ -58,7 +60,4 @@
         src: "{{ kube_proxy_extract_dir }}/kube-proxy-{{ kube_proxy_version }}/kube-proxy"
         path: "{{ kube_proxy_binary_dir }}/kube-proxy"
         state: link
-        mode: a+x
-
-  when:
-    - not kube_proxy_file_found.stat.exists
+        mode: '0777'

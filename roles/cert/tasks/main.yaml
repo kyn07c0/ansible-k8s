@@ -11,8 +11,9 @@
     path: "{{ cert_local_dir }}/{{ cert_ca_cert_file }}"
   register: ca_file
 
-- block:
-
+- name: Generate self signed certificate
+  when: not ca_file.stat.exists
+  block:
     - name: Generate private key
       community.crypto.openssl_privatekey:
         path: "{{ cert_local_dir }}/{{ cert_ca_key_file }}"
@@ -43,5 +44,3 @@
         csr_path: "{{ cert_local_dir }}/{{ cert_ca_csr_file }}"
         provider: selfsigned
         mode: '0644'
-
-  when: not ca_file.stat.exists

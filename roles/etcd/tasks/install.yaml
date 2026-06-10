@@ -25,8 +25,8 @@
   register: etcdctl_file_found
 
 - name: Install etcd if it is not already installed
+  when: (not etcd_file_found.stat.exists) or (not etcdctl_file_found.stat.exists)
   block:
-
     - name: Download etcd from url
       ansible.builtin.unarchive:
         src: "https://github.com/etcd-io/etcd/releases/download/v{{ etcd_version }}/etcd-v{{ etcd_version }}-{{ os.stdout | lower }}-{{ architecture.stdout }}.tar.gz"
@@ -51,5 +51,3 @@
       with_items:
         - etcd
         - etcdctl
-
-  when: (not etcd_file_found.stat.exists) or (not etcdctl_file_found.stat.exists)

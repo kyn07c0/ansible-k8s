@@ -6,8 +6,9 @@
   register: kube_apiserver_file_found
 
 - name: Install kube-apiserver if it is not already installed
+  when:
+    - not kube_apiserver_file_found.stat.exists
   block:
-
     - name: Create kube-apiserver directory
       ansible.builtin.file:
         path: "{{ kube_apiserver_extract_dir }}/kube-apiserver-{{ kube_apiserver_version }}"
@@ -42,7 +43,4 @@
         src: "{{ kube_apiserver_extract_dir }}/kube-apiserver-{{ kube_apiserver_version }}/kube-apiserver"
         path: "{{ kube_apiserver_binary_dir }}/kube-apiserver"
         state: link
-        mode: a+x
-
-  when:
-    - not kube_apiserver_file_found.stat.exists
+        mode: '0777'
