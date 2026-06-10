@@ -1,7 +1,7 @@
 ---
 
 # Metrics Server версия
-metrics_version: "0.7.1"
+metrics_version: "0.8.0"
 
 # Ресурсы
 metrics_cpu_request: "100m"
@@ -10,10 +10,10 @@ metrics_memory_request: "200Mi"
 metrics_memory_limit: "500Mi"
 
 # Реплики
-metrics_replicas: 1
+metrics_replicas: 2
 
 # Настройки сбора метрик
-metrics_resolution: "15s"
+metrics_resolution: "30s"
 metrics_metric_duration: "5m0s"
 metrics_kubelet_insecure_tls: true
 metrics_kubelet_preferred_address_types: "InternalIP,Hostname,ExternalIP"

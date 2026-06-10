@@ -1,16 +1,29 @@
 ---
 
-- name: Check if swap is active
-  ansible.builtin.command: swapon --show
-  register: swap_info
+- name: Disable all swap devices
+  ansible.builtin.command: swapoff -a
+  when: ansible_swaptotal_mb > 0
   changed_when: false
 
-- name: Disable swap in current session
-  ansible.builtin.command: swapoff -a
-  when: swap_info.stdout != "" | length > 0
+- name: Remove swap entries from /etc/fstab
+  ansible.posix.mount:
+    name: "{{ item }}"
+    fstype: swap
+    state: absent
+  loop:
+    - swap
+    - none
 
-- name: Disable swap after reboot
-  ansible.builtin.replace:
-    path: "/etc/fstab"
-    regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
-    replace: '# \1'
+#- name: Check if swap is active
+#  ansible.builtin.command: swapon --show
+#  register: swap_info
+
+#- name: Disable swap in current session
+#  ansible.builtin.command: swapoff -a
+#  when: swap_info.stdout != "" | length > 0
+
+#- name: Disable swap after reboot
+#  ansible.builtin.replace:
+#    path: "/etc/fstab"
+#    regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+#    replace: '# \1'

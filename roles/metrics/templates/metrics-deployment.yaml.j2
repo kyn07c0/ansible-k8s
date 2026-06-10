@@ -47,10 +47,9 @@ spec:
       containers:
         - name: metrics-server
           image: registry.k8s.io/metrics-server/metrics-server:v{{ metrics_version }}
-          imagePullPolicy: IfNotPresent
           args:
             - --cert-dir=/tmp
-            - --secure-port=10250
+            - --secure-port=4443
             - --kubelet-preferred-address-types={{ metrics_kubelet_preferred_address_types }}
             - --kubelet-use-node-status-port
             - --metric-resolution={{ metrics_resolution }}
@@ -60,7 +59,7 @@ spec:
             - --enable-vpa={{ metrics_enable_autoscaling | lower }}
           ports:
             - name: https
-              containerPort: 10250
+              containerPort: 4443
               protocol: TCP
           resources:
             limits:
@@ -70,18 +69,18 @@ spec:
               cpu: {{ metrics_cpu_request }}
               memory: {{ metrics_memory_request }}
           livenessProbe:
-            failureThreshold: 3
             httpGet:
               path: /livez
               port: https
               scheme: HTTPS
+            initialDelaySeconds: 20
             periodSeconds: 10
           readinessProbe:
-            failureThreshold: 3
             httpGet:
               path: /readyz
               port: https
               scheme: HTTPS
+            initialDelaySeconds: 20
             periodSeconds: 10
           securityContext:
             allowPrivilegeEscalation: false

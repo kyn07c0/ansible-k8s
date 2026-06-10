@@ -6,7 +6,7 @@
     dest: /etc/systemd/system/kube-controller-manager.service
     mode: '0644'
   notify:
-    - reload systemd
+    - Reload systemd
 
 - name: Enable and start kube-controller-manager
   ansible.builtin.systemd:

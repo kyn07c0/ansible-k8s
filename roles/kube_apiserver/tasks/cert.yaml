@@ -128,7 +128,7 @@
   community.crypto.x509_certificate:
     path: "{{ cert_local_dir }}/{{ kube_apiserver_service_account_cert_file }}"
     privatekey_path: "{{ cert_local_dir }}/{{ kube_apiserver_service_account_key_file }}"
-    csr_path: "{{ cert_local_dir }}/{{ kube_server_service_account_csr_file }}"
+    csr_path: "{{ cert_local_dir }}/{{ kube_apiserver_service_account_csr_file }}"
     ownca_path: "{{ cert_local_dir }}/{{ ca_cert_file }}"
     ownca_privatekey_path: "{{ cert_local_dir }}/{{ ca_key_file }}"
     provider: ownca

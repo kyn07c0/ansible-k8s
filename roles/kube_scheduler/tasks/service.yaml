@@ -6,8 +6,8 @@
     dest: /etc/systemd/system/kube-scheduler.service
     mode: '0644'
   notify:
-    - reload systemd
-    - restart kube-scheduler
+    - Reload systemd
+    - Restart kube-scheduler
 
 - name: Enable and start kube-scheduler
   ansible.builtin.systemd:

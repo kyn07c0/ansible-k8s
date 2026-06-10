@@ -6,7 +6,7 @@
     dest: /etc/systemd/system/containerd.service
     mode: '0644'
   notify:
-    - reload systemd
+    - Reload systemd
 
 - name: Enable and start containerd
   ansible.builtin.systemd:

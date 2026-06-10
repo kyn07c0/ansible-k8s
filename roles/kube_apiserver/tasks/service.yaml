@@ -24,7 +24,7 @@
     daemon_reload: true
     state: restarted
   when: service_file_changed.changed
-  notify: reload systemd
+  notify: Reload systemd
 
 - name: Wait kube-apiserver to be ready
   ansible.builtin.uri:

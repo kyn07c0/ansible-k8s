@@ -6,7 +6,7 @@
     dest: /etc/systemd/system/kubelet.service
     mode: '0644'
   notify:
-    - reload systemd
+    - Reload systemd
 
 - name: Enable and start kubelet
   ansible.builtin.systemd:

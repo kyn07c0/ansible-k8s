@@ -19,8 +19,8 @@
   vars:
     is_initial_run: "{{ not etcd_data.stat.exists }}"
   notify:
-    - reload systemd
-    - restart etcd
+    - Reload systemd
+    - Restart etcd
 
 - name: Enable etcd service
   ansible.builtin.systemd:

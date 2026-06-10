@@ -6,7 +6,7 @@
     dest: /etc/systemd/system/keepalived.service
     mode: '0644'
   notify:
-    - reload systemd
+    - Reload systemd
 
 - name: Enable and start Keepalived
   ansible.builtin.systemd:
