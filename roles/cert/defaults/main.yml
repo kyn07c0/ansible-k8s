@@ -1,0 +1,6 @@
+---
+
+cert_local_dir: ~/k8s/cert
+cert_ca_key_file: ca.key
+cert_ca_csr_file: ca.csr
+cert_ca_cert_file: ca.crt

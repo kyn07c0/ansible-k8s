@@ -13,9 +13,9 @@
 - name: Generation ca certificate
   hosts: localhost
   roles:
-    - ca_certificate
+    - cert
   become: false
-  tags: ca_certificate
+  tags: cert
 
 - name: Installation kubectl
   hosts:
