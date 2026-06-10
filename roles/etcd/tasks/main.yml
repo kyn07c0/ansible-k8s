@@ -1,10 +1,13 @@
 ---
 
-- ansible.builtin.include_tasks:
+- name: Generate certificate
+  ansible.builtin.include_tasks:
     file: cert.yaml
 
-- ansible.builtin.include_tasks:
+- name: Install and configure etcd
+  ansible.builtin.include_tasks:
     file: install.yaml
 
-- ansible.builtin.include_tasks:
+- name: Set up service etcd
+  ansible.builtin.include_tasks:
     file: service.yaml

@@ -1,7 +1,9 @@
 ---
 
-- ansible.builtin.include_tasks:
+- name: Install and configure containerd
+  ansible.builtin.include_tasks:
     file: install.yaml
 
-- ansible.builtin.include_tasks:
+- name: Set up service containerd
+  ansible.builtin.include_tasks:
     file: service.yaml

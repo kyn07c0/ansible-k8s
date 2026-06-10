@@ -1,13 +1,17 @@
 ---
 
-- ansible.builtin.include_tasks:
+- name: Set up hostname
+  ansible.builtin.include_tasks:
     file: hostname.yaml
 
-- ansible.builtin.include_tasks:
+- name: Turning off swap
+  ansible.builtin.include_tasks:
     file: swap.yaml
 
-- ansible.builtin.include_tasks:
+- name: Install packeges
+  ansible.builtin.include_tasks:
     file: packages.yaml
 
-- ansible.builtin.include_tasks:
+- name: Set up sysctl parameters
+  ansible.builtin.include_tasks:
     file: sysctl.yaml

@@ -1,16 +1,21 @@
 ---
 
-- ansible.builtin.include_tasks:
+- name: Generate certificate
+  ansible.builtin.include_tasks:
     file: cert.yaml
 
-- ansible.builtin.include_tasks:
+- name: Encription configure file
+  ansible.builtin.include_tasks:
     file: encryption_config.yaml
 
-- ansible.builtin.include_tasks:
+- name: Install and configure kube-apiserver
+  ansible.builtin.include_tasks:
     file: install.yaml
 
-- ansible.builtin.include_tasks:
+- name: Set up service kube-apiserver
+  ansible.builtin.include_tasks:
     file: service.yaml
 
-- ansible.builtin.include_tasks:
+- name: Set up RBCA roles
+  ansible.builtin.include_tasks:
     file: rbca_role.yaml
