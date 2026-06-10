@@ -33,11 +33,13 @@
         path: "{{ kube_proxy_extract_dir }}/kube-proxy-{{ kube_proxy_version }}"
         state: directory
 
-    - shell: uname -s
+    - ansible.builtin.command: uname -s
       register: os
+      changed_when: false
 
-    - shell: dpkg --print-architecture
+    - ansible.builtin.command: dpkg --print-architecture
       register: architecture
+      changed_when: false
 
     - name: Install kube-proxy from url
       ansible.builtin.get_url:

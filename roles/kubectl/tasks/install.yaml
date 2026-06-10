@@ -10,12 +10,14 @@
     - not kubectl_file_found.stat.exists
   block:
     - name: Getting the OS name
-      ansible.builtin.shell: uname -s
+      ansible.builtin.command: uname -s
       register: os
+      changed_when: false
 
     - name: Getting the OS architecture
-      ansible.builtin.shell: dpkg --print-architecture
+      ansible.builtin.command: dpkg --print-architecture
       register: architecture
+      changed_when: false
 
     - name: Install kubectl from url
       ansible.builtin.get_url:

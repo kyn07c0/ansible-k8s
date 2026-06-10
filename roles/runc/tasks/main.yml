@@ -16,12 +16,14 @@
         mode: '0755'
 
     - name: Getting the OS name
-      ansible.builtin.shell: uname -s
+      ansible.builtin.command: uname -s
       register: os
+      changed_when: false
 
     - name: Getting the OS architecture
-      ansible.builtin.shell: dpkg --print-architecture
+      ansible.builtin.command: dpkg --print-architecture
       register: architecture
+      changed_when: false
 
     - name: Download runc from network
       ansible.builtin.get_url:
