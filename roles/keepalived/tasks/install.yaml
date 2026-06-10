@@ -7,7 +7,7 @@
     mode: '0750'
 
 - name: Get interface name
-  set_fact:
+  ansible.builtin.set_fact:
     interface_name: "{{ ansible_interfaces | select('contains', ansible_default_ipv4.interface) | list | first }}"
   when: ansible_default_ipv4 is defined
 

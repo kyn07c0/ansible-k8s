@@ -2,10 +2,10 @@
 
 - name: Reload systemd
   ansible.builtin.systemd:
-    daemon_reload: yes
+    daemon_reload: true
 
 - name: Restart service
   ansible.builtin.systemd:
     name: haproxy
     state: restarted
-    enabled: yes
+    enabled: true

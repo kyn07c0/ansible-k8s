@@ -45,7 +45,7 @@
     - containerd_install_mode == 'local'
 
 - name: Find all files in containerd
-  find:
+  ansible.builtin.find:
     paths: "{{ containerd_extract_dir }}/containerd-{{ containerd_version }}/bin"
   register: find
 

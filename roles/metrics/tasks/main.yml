@@ -4,10 +4,6 @@
   ansible.builtin.command: kubectl version --client
   changed_when: false
 
-#- name: Create namespace kube-system (if not exist)
-#  ansible.builtin.command: kubectl create namespace kube-system --dry-run=client -o yaml | kubectl apply -f - --kubeconfig="{{ lookup('env', 'HOME') }}/.kube/config"
-#  changed_when: true
-
 - name: Apply RBAC for metrics server
   ansible.builtin.template:
     src: metrics-rbac.yaml.j2
