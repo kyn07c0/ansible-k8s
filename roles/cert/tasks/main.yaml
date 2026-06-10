@@ -1,7 +1,7 @@
 ---
 
 - name: Create local cert directory
-  file:
+  ansible.builtin.file:
     path: "{{ cert_local_dir }}"
     state: directory
     mode: '0700'

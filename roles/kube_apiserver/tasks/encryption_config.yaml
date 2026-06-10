@@ -1,12 +1,12 @@
 ---
 
 - name: Create config directory
-  file:
+  ansible.builtin.file:
     path: "{{ kube_apiserver_conf_dir }}"
     state: directory
 
 - name: Generate an encryption key
-  set_fact:
+  ansible.builtin.set_fact:
     encryption_key: "{{ lookup('community.general.random_string', length=32, base64=True) }}"
 
 - name: Create the encryption config file

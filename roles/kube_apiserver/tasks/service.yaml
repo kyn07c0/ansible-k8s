@@ -1,7 +1,7 @@
 ---
 
 - name: Prepare etcd servers string
-  set_fact:
+  ansible.builtin.set_fact:
     etcd_servers_string: "{{ groups['etcd'] | map('extract', hostvars, 'ansible_host') | map('regex_replace', '^(.*)$', 'https://\\1:2379') | join(',') }}"
 
 - name: Install service kube-apiserver

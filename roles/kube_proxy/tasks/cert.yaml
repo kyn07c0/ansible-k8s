@@ -1,7 +1,7 @@
 ---
 
 - name: Check for existence of CA file
-  stat:
+  ansible.builtin.stat:
     path: "{{ cert_local_dir }}/{{ ca_cert_file }}"
   register: ca_file_status
   delegate_to: localhost
@@ -9,7 +9,7 @@
   become: false
 
 - name: Stop playbook if file does not exist
-  fail:
+  ansible.builtin.fail:
     msg: "file {{ cert_local_dir }}/{{ ca_cert_file }} does not exist."
   when: not ca_file_status.stat.exists
   delegate_to: localhost
