@@ -48,6 +48,7 @@
     locality_name: "{{ locality_name }}"
     subject_alt_name: "DNS:{{ inventory_hostname }},IP:127.0.0.1,IP:{{ ansible_host }}"
     create_subject_key_identifier: true
+    mode: '0644'
   delegate_to: localhost
   become: false
 
@@ -59,6 +60,7 @@
     ownca_path: "{{ cert_local_dir }}/{{ ca_cert_file }}"
     ownca_privatekey_path: "{{ cert_local_dir }}/{{ ca_key_file }}"
     provider: ownca
+    mode: '0644'
   delegate_to: localhost
   become: false
 
@@ -70,6 +72,7 @@
   ansible.builtin.copy:
     src: "{{ cert_local_dir }}/{{ item }}"
     dest: "{{ cert_dir }}/{{ item }}"
+    mode: '0644'
   loop:
     - "{{ ca_key_file }}"
     - "{{ ca_cert_file }}"
@@ -82,13 +85,16 @@
   ansible.builtin.file:
     path: "{{ cert_dir }}"
     state: directory
+    mode: '0750'
 
 - name: Copy kubelet key file to remote servers
   ansible.builtin.copy:
     src: "{{ cert_local_dir }}/{{ kubelet_key_file }}"
     dest: "{{ cert_dir }}/{{ kubelet_key_file }}"
+    mode: '0644'
 
 - name: Copy kubelet certificate file to remote servers
   ansible.builtin.copy:
     src: "{{ cert_local_dir }}/{{ inventory_hostname }}_{{ kubelet_cert_file }}"
     dest: "{{ cert_dir }}/{{ kubelet_cert_file }}"
+    mode: '0644'

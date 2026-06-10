@@ -4,17 +4,20 @@
   ansible.builtin.file:
     path: "{{ containerd_config_dir }}"
     state: directory
+    mode: '0755'
 
 - name: Copy file containerd config
   ansible.builtin.template:
     src: containerd_config.toml.j2
     dest: "{{ containerd_config_dir }}/config.toml"
+    mode: '0644'
   register: config_file_status
 
 - name: Create containerd directory
   ansible.builtin.file:
     path: "{{ containerd_extract_dir }}/containerd-{{ containerd_version }}"
     state: directory
+    mode: '0755'
 
 - name: Getting the OS name
   ansible.builtin.shell: uname -s
@@ -49,7 +52,7 @@
     src: "{{ containerd_extract_dir }}/containerd-{{ containerd_version }}/bin/{{ item.path | basename }}"
     dest: "{{ containerd_binary_dir }}/{{ item.path | basename }}"
     state: link
-    mode: u+x
+    mode: '0755'
   with_items:
     - "{{ find.files }}"
 
@@ -57,3 +60,4 @@
   ansible.builtin.template:
     src: containerd_logrotate.j2
     dest: "/etc/logrotate.d/containerd"
+    mode: '0644'

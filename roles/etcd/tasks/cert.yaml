@@ -41,6 +41,7 @@
     path: "{{ cert_local_dir }}/etcd/{{ etcd_server_key_file }}"
     size: "{{ key_size }}"
     type: "{{ key_type }}"
+    mode: '0600'
   delegate_to: localhost
   run_once: true
   become: false
@@ -66,6 +67,7 @@
     locality_name: "{{ locality_name }}"
     subject_alt_name: "{{ san }}"
     create_subject_key_identifier: true
+    mode: '0644'
   delegate_to: localhost
   run_once: true
   become: false
@@ -79,6 +81,7 @@
     ownca_privatekey_path: "{{ cert_local_dir }}/{{ ca_key_file }}"
     provider: ownca
     ownca_not_after: "+{{ cert_expiry_days }}d"
+    mode: '0644'
   delegate_to: localhost
   run_once: true
   become: false
@@ -92,6 +95,7 @@
     path: "{{ cert_local_dir }}/etcd/{{ etcd_peer_key_file }}"
     size: "{{ key_size }}"
     type: "{{ key_type }}"
+    mode: '0600'
   delegate_to: localhost
   run_once: true
   become: false
@@ -130,6 +134,7 @@
     ownca_privatekey_path: "{{ cert_local_dir }}/{{ ca_key_file }}"
     provider: ownca
     ownca_not_after: "+{{ cert_expiry_days }}d"
+    mode: '0644'
   delegate_to: localhost
   run_once: true
   become: false
@@ -143,6 +148,7 @@
     path: "{{ cert_local_dir }}/etcd/{{ etcd_client_key_file }}"
     size: "{{ key_size }}"
     type: "{{ key_type }}"
+    mode: '0600'
   delegate_to: localhost
   run_once: true
   become: false
@@ -193,6 +199,7 @@
   ansible.builtin.copy:
     src: "{{ cert_local_dir }}/{{ item }}"
     dest: "{{ cert_dir }}/{{ item }}"
+    mode: '0600'
   loop:
     - "{{ ca_key_file }}"
     - "{{ ca_cert_file }}"
@@ -205,11 +212,13 @@
   ansible.builtin.file:
     path: "{{ cert_dir }}/etcd"
     state: directory
+    mode: '0700'
 
 - name: Copy certificate to remote servers
   ansible.builtin.copy:
     src: "{{ cert_local_dir }}/etcd/{{ item }}"
     dest: "{{ cert_dir }}/etcd/{{ item }}"
+    mode: "{{ '0600' if 'key' in item else '0644' }}" # Ключи - 600, сертификаты - 644
   loop:
     - "{{ etcd_server_key_file }}"
     - "{{ etcd_server_cert_file }}"

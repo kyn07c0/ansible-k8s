@@ -4,23 +4,26 @@
   ansible.builtin.file:
     path: "{{ resolv_conf }}"
     state: touch
-    mode: "0755"
+    mode: '0644'
 
 - name: Create kubelet directories
   ansible.builtin.file:
     path: "{{ kubelet_config_dir }}"
     state: directory
+    mode: '0755'
 
 - name: Copy file kubelet config
   ansible.builtin.template:
     src: config.yaml.j2
     dest: "{{ kubelet_config_dir }}/config.yaml"
+    mode: '0644'
   register: config_file_status
 
 - name: Create kubelet directory
   ansible.builtin.file:
     path: "{{ kubelet_extract_dir }}/kubelet-{{ kubelet_version }}"
     state: directory
+    mode: '0755'
 
 - name: Getting the OS name
   ansible.builtin.shell: uname -s
@@ -34,6 +37,7 @@
   ansible.builtin.get_url:
     url: "https://dl.k8s.io/v{{ kubelet_version }}/bin/{{ os.stdout | lower }}/{{ architecture.stdout }}/kubelet"
     dest: "{{ kubelet_extract_dir }}/kubelet-{{ kubelet_version }}"
+    mode: '0755'
   when:
     - kubelet_install_mode == 'network'
 
@@ -41,6 +45,7 @@
   ansible.builtin.copy:
     src: "{{ kubelet_local_binary_dir }}/kubelet"
     dest: "{{ kubelet_extract_dir }}/kubelet-{{ kubelet_version }}"
+    mode: '0755'
   when:
     - kubelet_install_mode == 'local'
 
@@ -49,4 +54,4 @@
     src: "{{ kubelet_extract_dir }}/kubelet-{{ kubelet_version }}/kubelet"
     path: "{{ kubelet_binary_dir }}/kubelet"
     state: link
-    mode: u+x
+    mode: '0777'

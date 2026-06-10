@@ -4,6 +4,7 @@
   file:
     path: "{{ cert_local_dir }}"
     state: directory
+    mode: '0700'
 
 - name: CA exists
   ansible.builtin.stat:
@@ -18,6 +19,7 @@
         size: "{{ cert_key_size }}"
         type: "{{ cert_key_type }}"
         backup: true
+        mode: '0600'
 
     - name: Generate certificate signing request with subject information
       community.crypto.openssl_csr:
@@ -32,6 +34,7 @@
         common_name: "CA"
         state_or_province_name: "{{ state_or_province_name }}"
         locality_name: "{{ locality_name }}"
+        mode: '0644'
 
     - name: Generate a self signed certificate
       community.crypto.x509_certificate:
@@ -39,5 +42,6 @@
         privatekey_path: "{{ cert_local_dir }}/{{ cert_ca_key_file }}"
         csr_path: "{{ cert_local_dir }}/{{ cert_ca_csr_file }}"
         provider: selfsigned
+        mode: '0644'
 
   when: not ca_file.stat.exists

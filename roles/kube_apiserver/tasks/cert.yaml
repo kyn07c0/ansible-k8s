@@ -43,6 +43,7 @@
     path: "{{ cert_local_dir }}/{{ kube_apiserver_key_file }}"
     size: "{{ key_size }}"
     type: "{{ key_type }}"
+    mode: '0600'
   delegate_to: localhost
   run_once: true
   become: false
@@ -68,6 +69,7 @@
     locality_name: "{{ locality_name }}"
     subject_alt_name: "{{ san }}"
     create_subject_key_identifier: true
+    mode: '0644'
   delegate_to: localhost
   run_once: true
   become: false
@@ -80,6 +82,7 @@
     ownca_path: "{{ cert_local_dir }}/{{ ca_cert_file }}"
     ownca_privatekey_path: "{{ cert_local_dir }}/{{ ca_key_file }}"
     provider: ownca
+    mode: '0644'
     ownca_not_after: "+{{ cert_expiry_days }}d"
   delegate_to: localhost
   run_once: true
@@ -94,6 +97,7 @@
     path: "{{ cert_local_dir }}/{{ service_account_key_file }}"
     size: "{{ key_size }}"
     type: "{{ key_type }}"
+    mode: '0600'
   delegate_to: localhost
   run_once: true
   become: false
@@ -115,6 +119,7 @@
     locality_name: "{{ locality_name }}"
     use_common_name_for_san: false
     create_subject_key_identifier: true
+    mode: '0644'
   delegate_to: localhost
   run_once: true
   become: false
@@ -127,6 +132,7 @@
     ownca_path: "{{ cert_local_dir }}/{{ ca_cert_file }}"
     ownca_privatekey_path: "{{ cert_local_dir }}/{{ ca_key_file }}"
     provider: ownca
+    mode: '0644'
   delegate_to: localhost
   run_once: true
   become: false
@@ -140,6 +146,7 @@
     path: "{{ cert_local_dir }}/{{ proxy_client_key_file }}"
     size: "{{ key_size }}"
     type: "{{ key_type }}"
+    mode: '0600'
   delegate_to: localhost
   run_once: true
   become: false
@@ -163,6 +170,7 @@
     locality_name: "{{ locality_name }}"
     use_common_name_for_san: false
     create_subject_key_identifier: true
+    mode: '0644'
   delegate_to: localhost
   run_once: true
   become: false
@@ -175,6 +183,7 @@
     ownca_path: "{{ cert_local_dir }}/{{ ca_cert_file }}"
     ownca_privatekey_path: "{{ cert_local_dir }}/{{ ca_key_file }}"
     provider: ownca
+    mode: '0644'
   delegate_to: localhost
   run_once: true
   become: false
@@ -187,6 +196,7 @@
   ansible.builtin.copy:
     src: "{{ cert_local_dir }}/{{ item }}"
     dest: "{{ cert_dir }}/{{ item }}"
+    mode: '0644'
   loop:
     - "{{ ca_key_file }}"
     - "{{ ca_cert_file }}"
@@ -199,11 +209,13 @@
   ansible.builtin.file:
     path: "{{ cert_dir }}"
     state: directory
+    mode: '0750'
 
 - name: Copy certificate to remote servers
   ansible.builtin.copy:
     src: "{{ cert_local_dir }}/{{ item }}"
     dest: "{{ cert_dir }}/{{ item }}"
+    mode: '0644'
   loop:
     - "{{ kube_apiserver_key_file }}"
     - "{{ kube_apiserver_cert_file }}"

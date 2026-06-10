@@ -4,6 +4,7 @@
   ansible.builtin.file:
     path: "{{ keepalived_config_dir }}"
     state: directory
+    mode: '0750'
 
 - name: Get interface name
   set_fact:

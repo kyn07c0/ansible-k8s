@@ -12,6 +12,7 @@
       ansible.builtin.file:
         path: "{{ runc_extract_dir }}/runc-{{ runc_version }}"
         state: directory
+        mode: '0755'
 
     - name: Getting the OS name
       ansible.builtin.shell: uname -s
@@ -25,6 +26,7 @@
       ansible.builtin.get_url:
         url: "https://github.com/opencontainers/runc/releases/download/v{{ runc_version }}/runc.{{ architecture.stdout }}"
         dest: "{{ runc_extract_dir }}/runc-{{ runc_version }}"
+        mode: '0755'
       when:
         - runc_install_mode == 'network'
 
@@ -32,6 +34,7 @@
       ansible.builtin.copy:
         src: "{{ runc_local_binary_dir }}/runc.{{ architecture.stdout }}"
         dest: "{{ runc_extract_dir }}/runc-{{ runc_version }}"
+        mode: '0755'
       when:
         - runc_install_mode == 'local'
 
@@ -45,7 +48,7 @@
         src: "{{ runc_extract_dir }}/runc-{{ runc_version }}/runc"
         path: "{{ runc_binary_dir }}/runc"
         state: link
-        mode: u+x
+        mode: '0777'
 
   when:
     - not runc_file_found.stat.exists
