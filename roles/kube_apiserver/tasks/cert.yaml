@@ -94,7 +94,7 @@
 
 - name: Generate private key for service-account
   community.crypto.openssl_privatekey:
-    path: "{{ cert_local_dir }}/{{ service_account_key_file }}"
+    path: "{{ cert_local_dir }}/{{ kube_apiserver_service_account_key_file }}"
     size: "{{ key_size }}"
     type: "{{ key_type }}"
     mode: '0600'
@@ -104,8 +104,8 @@
 
 - name: Generate a CSR file for service-account
   community.crypto.openssl_csr:
-    path: "{{ cert_local_dir }}/{{ service_account_csr_file }}"
-    privatekey_path: "{{ cert_local_dir }}/{{ service_account_key_file }}"
+    path: "{{ cert_local_dir }}/{{ kube_apiserver_service_account_csr_file }}"
+    privatekey_path: "{{ cert_local_dir }}/{{ kube_apiserver_service_account_key_file }}"
     basic_constraints: "CA:FALSE"
     extended_key_usage:
       - clientAuth
@@ -126,9 +126,9 @@
 
 - name: Generate a certificate service-account
   community.crypto.x509_certificate:
-    path: "{{ cert_local_dir }}/{{ service_account_cert_file }}"
-    privatekey_path: "{{ cert_local_dir }}/{{ service_account_key_file }}"
-    csr_path: "{{ cert_local_dir }}/{{ service_account_csr_file }}"
+    path: "{{ cert_local_dir }}/{{ kube_apiserver_service_account_cert_file }}"
+    privatekey_path: "{{ cert_local_dir }}/{{ kube_apiserver_service_account_key_file }}"
+    csr_path: "{{ cert_local_dir }}/{{ kube_server_service_account_csr_file }}"
     ownca_path: "{{ cert_local_dir }}/{{ ca_cert_file }}"
     ownca_privatekey_path: "{{ cert_local_dir }}/{{ ca_key_file }}"
     provider: ownca
@@ -143,7 +143,7 @@
 
 - name: Generate private key for proxy-client
   community.crypto.openssl_privatekey:
-    path: "{{ cert_local_dir }}/{{ proxy_client_key_file }}"
+    path: "{{ cert_local_dir }}/{{ kube_apiserver_proxy_client_key_file }}"
     size: "{{ key_size }}"
     type: "{{ key_type }}"
     mode: '0600'
@@ -153,8 +153,8 @@
 
 - name: Generate a CSR file for proxy-client
   community.crypto.openssl_csr:
-    path: "{{ cert_local_dir }}/{{ proxy_client_csr_file }}"
-    privatekey_path: "{{ cert_local_dir }}/{{ proxy_client_key_file }}"
+    path: "{{ cert_local_dir }}/{{ kube_apiserver_proxy_client_csr_file }}"
+    privatekey_path: "{{ cert_local_dir }}/{{ kube_apiserver_proxy_client_key_file }}"
     basic_constraints: "CA:FALSE"
     extended_key_usage:
       - clientAuth
@@ -177,9 +177,9 @@
 
 - name: Generate a certificate for proxy-client
   community.crypto.x509_certificate:
-    path: "{{ cert_local_dir }}/{{ proxy_client_cert_file }}"
-    privatekey_path: "{{ cert_local_dir }}/{{ proxy_client_key_file }}"
-    csr_path: "{{ cert_local_dir }}/{{ proxy_client_csr_file }}"
+    path: "{{ cert_local_dir }}/{{ kube_apiserver_proxy_client_cert_file }}"
+    privatekey_path: "{{ cert_local_dir }}/{{ kube_apiserver_proxy_client_key_file }}"
+    csr_path: "{{ cert_local_dir }}/{{ kube_apiserver_proxy_client_csr_file }}"
     ownca_path: "{{ cert_local_dir }}/{{ ca_cert_file }}"
     ownca_privatekey_path: "{{ cert_local_dir }}/{{ ca_key_file }}"
     provider: ownca
@@ -219,7 +219,7 @@
   loop:
     - "{{ kube_apiserver_key_file }}"
     - "{{ kube_apiserver_cert_file }}"
-    - "{{ service_account_key_file }}"
-    - "{{ service_account_cert_file }}"
-    - "{{ proxy_client_key_file }}"
-    - "{{ proxy_client_cert_file }}"
+    - "{{ kube_apiserver_service_account_key_file }}"
+    - "{{ kube_apiserver_service_account_cert_file }}"
+    - "{{ kube_apiserver_proxy_client_key_file }}"
+    - "{{ kube_apiserver_proxy_client_cert_file }}"

@@ -14,9 +14,9 @@ kube_apiserver_kubeconf_dir: /root/.kube
 kube_apiserver_key_file: kube-apiserver.key
 kube_apiserver_csr_file: kube-apiserver.csr
 kube_apiserver_cert_file: kube-apiserver.crt
-service_account_key_file: service-account.key
-service_account_csr_file: service-account.csr
-service_account_cert_file: service-account.crt
-proxy_client_key_file: proxy-client.key
-proxy_client_csr_file: proxy-client.csr
-proxy_client_cert_file: proxy-client.crt
+kube_apiserver_service_account_key_file: service-account.key
+kube_apiserver_service_account_csr_file: service-account.csr
+kube_apiserver_service_account_cert_file: service-account.crt
+kube_apiserver_proxy_client_key_file: proxy-client.key
+kube_apiserver_proxy_client_csr_file: proxy-client.csr
+kube_apiserver_proxy_client_cert_file: proxy-client.crt
