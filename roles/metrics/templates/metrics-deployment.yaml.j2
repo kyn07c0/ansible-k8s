@@ -1,3 +1,5 @@
+---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,6 +18,7 @@ spec:
         k8s-app: metrics-server
     spec:
       serviceAccountName: metrics-server
+      hostNetwork: true
       priorityClassName: system-cluster-critical
       tolerations:
         - key: CriticalAddonsOnly
@@ -54,9 +57,9 @@ spec:
             - --kubelet-use-node-status-port
             - --metric-resolution={{ metrics_resolution }}
             - --kubelet-insecure-tls={{ metrics_kubelet_insecure_tls | lower }}
-            - --metric-duration={{ metrics_metric_duration }}
-            - --enable-hpa={{ metrics_enable_autoscaling | lower }}
-            - --enable-vpa={{ metrics_enable_autoscaling | lower }}
+            #- --metric-duration={{ metrics_metric_duration }}
+            #- --enable-hpa={{ metrics_enable_autoscaling | lower }}
+            #- --enable-vpa={{ metrics_enable_autoscaling | lower }}
           ports:
             - name: https
               containerPort: 4443
@@ -108,6 +111,6 @@ spec:
     k8s-app: metrics-server
   ports:
     - name: https
-      port: 443
-      targetPort: https
+      port: 4443
+      targetPort: 4443
       protocol: TCP
