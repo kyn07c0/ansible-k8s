@@ -7,13 +7,7 @@
     mode: '0644'
   notify:
     - Reload systemd
-
-- name: Enable and start kubelet
-  ansible.builtin.systemd:
-    name: kubelet
-    state: restarted
-    enabled: true
-  when: config_file_status.changed
+    - Restart kubelet
 
 - name: Check started service
   ansible.builtin.service:

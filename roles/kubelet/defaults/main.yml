@@ -10,7 +10,7 @@ kubelet_local_binary_dir: /home/yura/k8s/binary
 
 kubelet_kubeconfig_dir: /etc/kubernetes
 
-resolv_conf: /etc/resolv.conf
+kubelet_resolv_conf: /etc/resolv.conf
 
 kubelet_key_file: kubelet.key
 kubelet_csr_file: kubelet.csr

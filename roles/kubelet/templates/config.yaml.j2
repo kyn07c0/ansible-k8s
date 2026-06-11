@@ -17,7 +17,7 @@ clusterDNS:
 cgroupDriver: systemd
 containerRuntimeEndpoint: "unix:///var/run/containerd/containerd.sock"
 podCIDR: "{{ hostvars[inventory_hostname]['pod_subnet'] }}"
-resolvConf: "{{ resolv_conf }}"
+resolvConf: "{{ kubelet_resolv_conf }}"
 runtimeRequestTimeout: "15m"
 tlsCertFile: "{{ cert_dir }}/{{ kubelet_cert_file }}"
 tlsPrivateKeyFile: "{{ cert_dir }}/{{ kubelet_key_file }}"

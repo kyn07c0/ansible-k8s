@@ -13,17 +13,3 @@
   loop:
     - swap
     - none
-
-#- name: Check if swap is active
-#  ansible.builtin.command: swapon --show
-#  register: swap_info
-
-#- name: Disable swap in current session
-#  ansible.builtin.command: swapoff -a
-#  when: swap_info.stdout != "" | length > 0
-
-#- name: Disable swap after reboot
-#  ansible.builtin.replace:
-#    path: "/etc/fstab"
-#    regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
-#    replace: '# \1'

@@ -2,7 +2,7 @@
 
 - name: Create resolv.conf file
   ansible.builtin.file:
-    path: "{{ resolv_conf }}"
+    path: "{{ kubelet_resolv_conf }}"
     state: touch
     mode: '0644'
 
