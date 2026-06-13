@@ -11,7 +11,9 @@
     mode: '0644'
 
 - name: Apply RBAC manifest
-  ansible.builtin.command: kubectl apply -f /tmp/metrics-rbac.yaml --kubeconfig="{{ lookup('env', 'HOME') }}/.kube/config"
+  ansible.builtin.command: |
+    kubectl apply -f /tmp/metrics-rbac.yaml \
+      --kubeconfig="{{ lookup('env', 'HOME') }}/.kube/config"
   changed_when: true
 
 - name: Deployment metrics server
@@ -21,7 +23,9 @@
     mode: '0644'
 
 - name: Apply deployment manifest
-  ansible.builtin.command: kubectl apply -f /tmp/metrics-deployment.yaml --kubeconfig="{{ lookup('env', 'HOME') }}/.kube/config"
+  ansible.builtin.command: |
+    kubectl apply -f /tmp/metrics-deployment.yaml \
+      --kubeconfig="{{ lookup('env', 'HOME') }}/.kube/config"
   changed_when: true
 
 - name: Create APIService for metrics server
@@ -31,7 +35,9 @@
     mode: '0644'
 
 - name: Apply APIService manifest
-  ansible.builtin.command: kubectl apply -f /tmp/metrics-apiservice.yaml --kubeconfig="{{ lookup('env', 'HOME') }}/.kube/config"
+  ansible.builtin.command: |
+    kubectl apply -f /tmp/metrics-apiservice.yaml \
+      --kubeconfig="{{ lookup('env', 'HOME') }}/.kube/config"
   changed_when: true
 
 - name: Waiting for readiness metrics server pod
@@ -45,7 +51,8 @@
 
 - name: Waiting for readiness API metric
   ansible.builtin.shell: |
-    kubectl top nodes
+    kubectl top nodes \
+      --kubeconfig="{{ lookup('env', 'HOME') }}/.kube/config"
   changed_when: false
   register: metrics_test
   ignore_errors: true
