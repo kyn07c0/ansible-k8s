@@ -69,14 +69,11 @@
 # Copy CA to remote servers
 ################################################################################
 
-- name: Copy CA to remote servers
+- name: Copy CA certificate to remote servers
   ansible.builtin.copy:
-    src: "{{ cert_local_dir }}/{{ item }}"
-    dest: "{{ cert_dir }}/{{ item }}"
+    src: "{{ cert_local_dir }}/{{ ca_cert_file }}"
+    dest: "{{ cert_dir }}/{{ ca_cert_file }}"
     mode: '0644'
-  loop:
-    - "{{ ca_key_file }}"
-    - "{{ ca_cert_file }}"
 
 ################################################################################
 # Copy kubelet certificate to remote servers
@@ -92,7 +89,7 @@
   ansible.builtin.copy:
     src: "{{ cert_local_dir }}/{{ kubelet_key_file }}"
     dest: "{{ cert_dir }}/{{ kubelet_key_file }}"
-    mode: '0644'
+    mode: '0600'
 
 - name: Copy kubelet certificate file to remote servers
   ansible.builtin.copy:
