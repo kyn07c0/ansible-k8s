@@ -39,13 +39,52 @@
       autoDirectNodeRoutes: "{{ cilium_auto_direct_node_routes }}"
       bpf:
         masquerade: "{{ cilium_bpf_masquerade }}"
-      hubble:
-        relay:
-          enabled: "{{ cilium_enable_hubble }}"
-        ui:
-          enabled: "{{ cilium_enable_hubble_ui }}"
       bandwidthManager:
         enabled: "{{ cilium_bandwidth_manager }}"
+      hubble:
+        enabled: true
+        peerService:
+          enabled: true
+          clusterDomain: "{{ cluster_name }}.{{ domain_name }}"
+        relay:
+          enabled: "{{ cilium_enable_hubble }}"
+          tls:
+            enabled: true
+            auto:
+              enabled: true
+              method: "cronJob"
+              certValidityDuration: 1095
+          peerService:
+            name: "hubble-peer"
+            port: 443
+            targetPort: 4244
+            useEndpointSlice: true
+        ui:
+          enabled: "{{ cilium_enable_hubble_ui }}"
+          tls:
+            enable: true
+            auto: true
+        tls:
+          auto:
+            enabled: true
+            method: "cronJob"
+      #gatewayAPI:
+      #  enabled: "{{ cilium_enable_gateway_api }}"
+      #  enableAlpine: "{{ cilium_gateway_api_enable_alpine }}"
+      #l2announcements:
+      #  enabled: true
+      #loadBalancer:
+      #  algorithm: maglev
+      #  mode: dsr
+      global:
+        rbac:
+          extraRules:
+            - apiGroups: [""]
+              resources: ["endpoints"]
+              verbs: ["get", "list", "watch"]
+            - apiGroups: ["discovery.k8s.io"]
+              resources: ["endpointslices"]
+              verbs: ["get", "list", "watch"]
     wait: true
     timeout: 5m
 

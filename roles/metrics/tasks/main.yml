@@ -45,7 +45,7 @@
     kubectl wait --for=condition=ready pod \
       -l k8s-app=metrics-server \
       -n kube-system \
-      --timeout=300s \
+      --timeout=400s \
       --kubeconfig="{{ lookup('env', 'HOME') }}/.kube/config"
   changed_when: false
 

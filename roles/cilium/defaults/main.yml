@@ -16,6 +16,8 @@ cilium_bpf_masquerade: true
 cilium_enable_hubble: true
 cilium_enable_hubble_ui: true
 cilium_bandwidth_manager: false
+cilium_enable_gateway_api: true
+cilium_gateway_api_enable_alpine: true
 
 # Для проверок
 cilium_cli_version: "v0.15.23"
